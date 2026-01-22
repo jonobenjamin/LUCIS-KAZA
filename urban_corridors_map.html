@@ -149,7 +149,7 @@
                 }),
 
             // Load corridor-urban intersects (orange-red, on top)
-            fetch('./Data/corridor_urban_intersects_actual.geojson')
+            fetch('./Data/corridor_urban_intersect.geojson')
                 .then(r => r.json())
                 .then(geojson => {
                     urbanIntersectsLayer = L.geoJSON(geojson, {
