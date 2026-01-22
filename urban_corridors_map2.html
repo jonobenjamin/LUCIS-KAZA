@@ -35,7 +35,6 @@
                 <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
                 <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
                 <label><input type="checkbox" id="showCorridors"> Sensitivity Corridors</label>
-                <label><input type="checkbox" id="showIntersects"> Corridor Intersects</label>
                 <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
             </div>
         </div>
@@ -45,7 +44,6 @@
             <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
         </div>
     </div>
@@ -62,7 +60,6 @@
         let boundaryLayer;
         let urbanLayer;
         let corridorsLayer;
-        let intersectsLayer;
         let urbanIntersectsLayer;
 
         // Define different shades of red for styling
@@ -129,30 +126,8 @@
                     console.log('Loaded sensitivity corridors (middle layer)');
                 }),
 
-            // Load corridor intersects THIRD (on top of corridors)
-            fetch('./Data/KAZA_corridors_intersect_wgs84.geojson')
-                .then(r => r.json())
-                .then(geojson => {
-                    intersectsLayer = L.geoJSON(geojson, {
-                        style: {
-                            color: '#000000',
-                            weight: 4,
-                            opacity: 1,
-                            fillColor: '#000000',
-                            fillOpacity: 0.3
-                        },
-                        onEachFeature: function(feature, layer) {
-                            layer.bindPopup(`<b>Corridor Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
-                        }
-                    });
-                    if (document.getElementById('showIntersects').checked) {
-                        intersectsLayer.addTo(map);
-                    }
-                    console.log('Loaded corridor intersects (top layer)');
-                }),
-
-            // Load corridor-urban intersects (orange-red, on top)
-            fetch('./Data/corridor_urban_intersects_actual.geojson')
+            // Load corridor-urban intersects (black, on top)
+            fetch('./Data/corridor_urban_intersect.geojson')
                 .then(r => r.json())
                 .then(geojson => {
                     urbanIntersectsLayer = L.geoJSON(geojson, {
@@ -207,7 +182,6 @@
             if (boundaryLayer && document.getElementById('showBoundary').checked) visibleLayers.push(boundaryLayer);
             if (urbanLayer && document.getElementById('showUrban').checked) visibleLayers.push(urbanLayer);
             if (corridorsLayer && document.getElementById('showCorridors').checked) visibleLayers.push(corridorsLayer);
-            if (intersectsLayer && document.getElementById('showIntersects').checked) visibleLayers.push(intersectsLayer);
             if (urbanIntersectsLayer && document.getElementById('showUrbanIntersects').checked) visibleLayers.push(urbanIntersectsLayer);
 
             if (visibleLayers.length > 0) {
@@ -247,14 +221,6 @@
                 map.addLayer(corridorsLayer);
             } else if (corridorsLayer) {
                 map.removeLayer(corridorsLayer);
-            }
-        });
-
-        document.getElementById('showIntersects').addEventListener('change', function(e) {
-            if (e.target.checked && intersectsLayer) {
-                map.addLayer(intersectsLayer);
-            } else if (intersectsLayer) {
-                map.removeLayer(intersectsLayer);
             }
         });
 
