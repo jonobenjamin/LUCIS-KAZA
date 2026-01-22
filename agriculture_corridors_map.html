@@ -18,8 +18,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>KAZA Agriculture Fields & Micro Corridors</h1>
-        <p>Green agriculture fields with red micro corridors and distance-based transparency</p>
+        <h1>KAZA Agriculture Fields & Sensitivity Corridors</h1>
+        <p>Green agriculture fields with pre-buffered corridors in different shades of red</p>
     </div>
 
     <div class="map-container">
@@ -30,17 +30,13 @@
         <div class="legend">
             <h4>Map Legend</h4>
             <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545"></div><span>Micro Corridors</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545; opacity: 0.8"></div><span>500m Buffer</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545; opacity: 0.6"></div><span>1000m Buffer</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545; opacity: 0.4"></div><span>2000m Buffer</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545; opacity: 0.2"></div><span>4000m Buffer</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #dc3545; opacity: 0.1"></div><span>6000m Buffer</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #cc0000"></div><span>Buffer Zones (Various)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #880000"></div><span>Pre-buffered Areas</span></div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
     <script src="https://unpkg.com/shpjs@4.0.4/dist/shp.js"></script>
     <script>
         // Initialize map
@@ -49,9 +45,6 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Buffer distances in meters (user requested 500, 1000, 2000, 4000, 6000)
-        const bufferDistances = [500, 1000, 2000, 4000, 6000];
-        const bufferOpacities = [0.8, 0.6, 0.4, 0.2, 0.1]; // Decreasing transparency
 
         // Load agriculture fields first (green) - ACTUAL DATA
         const agriUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/Agri_fields_converted.geojson';
@@ -87,9 +80,9 @@
 
                 document.getElementById('status').textContent = 'Loading micro corridors...';
 
-                // Load micro corridors with buffers - ACTUAL DATA
-                const corridorsUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_micro_corridors_converted.geojson';
-                console.log('Loading corridors GeoJSON from:', corridorsUrl);
+                // Load pre-buffered corridors with different shades of red - ACTUAL DATA
+                const corridorsUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_corridors_sensitivity.geojson';
+                console.log('Loading pre-buffered corridors from:', corridorsUrl);
 
                 return fetch(corridorsUrl)
                     .then(response => {
@@ -99,28 +92,47 @@
                         return response.json();
                     })
                     .then(corridorsGeojson => {
-                        console.log('Loaded micro corridors:', corridorsGeojson.features.length, 'features');
+                        console.log('Loaded sensitivity corridors:', corridorsGeojson.features.length, 'features');
 
-                        // Add solid micro corridors in red
+                        // Define different shades of red for styling
+                        const redShades = [
+                            '#ff0000', // Bright red
+                            '#cc0000', // Dark red
+                            '#aa0000', // Deeper red
+                            '#880000', // Very dark red
+                            '#660000', // Deep maroon
+                            '#440000'  // Almost black red
+                        ];
+
+                        // Add pre-buffered corridors with different shades of red
                         const corridorsLayer = L.geoJSON(corridorsGeojson, {
-                            style: {
-                                color: '#dc3545',
-                                weight: 3,
-                                opacity: 1,
-                                fillColor: '#dc3545',
-                                fillOpacity: 1
+                            style: function(feature, layer) {
+                                // Use different shades based on feature index or properties
+                                const index = feature.properties.id ? parseInt(feature.properties.id) : layer._leaflet_id % redShades.length;
+                                const shadeIndex = index % redShades.length;
+
+                                return {
+                                    color: redShades[shadeIndex],
+                                    weight: 2,
+                                    opacity: 1,
+                                    fillColor: redShades[shadeIndex],
+                                    fillOpacity: 0.8
+                                };
                             },
                             onEachFeature: function(feature, layer) {
-                                const length = feature.properties.length_km;
-                                layer.bindPopup(`<b>Micro Corridor</b><br>Length: ${length} km`);
+                                const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
+                                const props = feature.properties;
+                                layer.bindPopup(`
+                                    <b>Sensitivity Corridor</b><br>
+                                    <strong>Area:</strong> ${area.toFixed(2)} km²<br>
+                                    <strong>ID:</strong> ${props.id || 'N/A'}<br>
+                                    <strong>Buffer Level:</strong> Pre-buffered
+                                `);
                             }
                         });
 
                         corridorsLayer.addTo(map);
-                        console.log('Added micro corridors to map');
-
-                        // Create distance buffers with decreasing transparency
-                        createBuffers(corridorsGeojson);
+                        console.log('Added sensitivity corridors with red shades');
 
                         // Fit map to show both layers
                         const allLayers = [agriLayer, corridorsLayer];
@@ -135,35 +147,6 @@
                 document.getElementById('status').textContent = `Error: ${error.message}`;
             });
 
-        // Create distance buffers with decreasing transparency
-        function createBuffers(corridorsGeojson) {
-            bufferDistances.forEach((distance, index) => {
-                const opacity = bufferOpacities[index];
-
-                // Create buffer around corridors
-                const buffered = turf.buffer(corridorsGeojson, distance / 1000, {units: 'kilometers'});
-
-                const bufferLayer = L.geoJSON(buffered, {
-                    style: {
-                        color: '#dc3545',
-                        weight: 1,
-                        opacity: opacity,
-                        fillColor: '#dc3545',
-                        fillOpacity: opacity
-                    },
-                    onEachFeature: function(feature, layer) {
-                        layer.bindPopup(`
-                            <b>Corridor Buffer</b><br>
-                            <strong>Distance:</strong> ${distance}m<br>
-                            <strong>Transparency:</strong> ${opacity}
-                        `);
-                    }
-                });
-
-                bufferLayer.addTo(map);
-                console.log(`Added ${distance}m buffer with opacity ${opacity}`);
-            });
-        }
 
         console.log('Agriculture and corridors map initialized');
     </script>
