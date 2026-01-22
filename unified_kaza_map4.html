@@ -98,6 +98,12 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>Agriculture Fields + Micro Corridors</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Agriculture Fields (Remote Sensing - WWF)
                 `
             },
             {
@@ -122,6 +128,12 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>Urban + Micro Corridors</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Populated Places (Google Buildings)
                 `
             },
             {
@@ -161,6 +173,12 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <div id="tiffLayerInfo">
+                        <strong>Select a TIFF layer to see layer information</strong>
+                    </div>
                 `
             },
             {
@@ -190,6 +208,12 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>LUCIS KAZA</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Conflict evaluation matrix (Conflict 4)
                 `
             }
         ];
@@ -357,6 +381,9 @@
 
             // Update legend
             document.getElementById('legend').innerHTML = config.legend;
+
+            // Update layer info
+            document.getElementById('layerInfo').innerHTML = config.layerInfo || '';
 
             // Clear current layers
             Object.values(currentLayers).forEach(layer => {
@@ -613,6 +640,44 @@
                                            <strong>Normalized Range:</strong> ${((classValue - 1) * 0.125).toFixed(3)} - ${(classValue * 0.125).toFixed(3)}`);
                         }
                     }).addTo(map);
+
+                    // Update layer information for TIFF layers
+                    const layerInfos = {
+                        'ag01': `<strong>AG1 - Agriculture 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Agriculture Fields (Remote Sensing - WWF)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Rivers (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)`,
+                        'ag02': `<strong>AG2 - Agriculture 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Wetlands (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ag03': `<strong>AG3 - Agriculture 3</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Wetlands (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ug01': `<strong>UG1 - Urban Growth 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Airport (Africa Parks)<br>
+                                • Water (Africa Parks)<br>
+                                • Infrastructure (Africa Parks)`,
+                        'ug02': `<strong>UG2 - Urban Growth 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • [Layer information not specified]`
+                    };
+
+                    document.getElementById('tiffLayerInfo').innerHTML = layerInfos[layerKey] || `<strong>${layerData.name}</strong><br><strong>Layers Used:</strong><br>• [Layer information not available]`;
 
                     document.getElementById('status').textContent = `Loaded ${layerData.name}: ${geojson.features.length} polygons`;
                 })
