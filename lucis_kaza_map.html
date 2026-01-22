@@ -87,7 +87,9 @@
         };
 
         // Load LUCIS_KAZA shapefile directly
-        shp('./Data/LUCIS_KAZA.shp')
+        const baseUrl = window.location.origin + '/Data/LUCIS_KAZA';
+        console.log('Loading shapefile from:', baseUrl);
+        shp(baseUrl)
             .then(geojson => {
                 console.log('Loaded LUCIS KAZA shapefile:', geojson.features.length, 'features');
                 return geojson;
@@ -155,7 +157,7 @@
                 document.getElementById('status').textContent = `Loaded ${geojson.features.length} features from KAZA region`;
             })
             .catch(error => {
-                console.error('Error loading KAZA GeoJSON:', error);
+                console.error('Error loading KAZA shapefile:', error);
                 document.getElementById('status').textContent = `Error loading data: ${error.message}`;
             });
 
