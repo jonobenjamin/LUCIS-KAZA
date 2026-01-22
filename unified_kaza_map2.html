@@ -102,14 +102,12 @@
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
                     urban: { show: true, file: './Data/KAZA_urban_areas.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
                     corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
-                    intersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
                     urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
                 },
                 controls: `
                     <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
                     <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
                     <label><input type="checkbox" id="showCorridors"> Sensitivity Corridors</label>
-                    <label><input type="checkbox" id="showIntersects"> Corridor Intersects</label>
                     <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
                 `,
                 legend: `
@@ -495,8 +493,12 @@
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
                 });
                 document.getElementById('showIntersects').addEventListener('change', function() {
-                    if (this.checked && currentLayers.intersects) map.addLayer(currentLayers.intersects);
-                    else if (currentLayers.intersects) map.removeLayer(currentLayers.intersects);
+                    if (this.checked && currentLayers.intersects) {
+                        map.addLayer(currentLayers.intersects);
+                        currentLayers.intersects.bringToFront();
+                    } else if (currentLayers.intersects) {
+                        map.removeLayer(currentLayers.intersects);
+                    }
                 });
             } else if (configIndex === 1) { // Urban
                 document.getElementById('showBoundary').addEventListener('change', function() {
@@ -510,10 +512,6 @@
                 document.getElementById('showCorridors').addEventListener('change', function() {
                     if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
-                });
-                document.getElementById('showIntersects').addEventListener('change', function() {
-                    if (this.checked && currentLayers.intersects) map.addLayer(currentLayers.intersects);
-                    else if (currentLayers.intersects) map.removeLayer(currentLayers.intersects);
                 });
                 document.getElementById('showUrbanIntersects').addEventListener('change', function() {
                     if (this.checked && currentLayers.urbanIntersects) {
