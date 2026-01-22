@@ -164,7 +164,7 @@
                 subtitle: "Color-coded by conflict codes from the conflict codes reference",
                 layers: {
                     lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
-                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
+                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
                     corridorIntersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
                     urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
                 },
@@ -173,14 +173,17 @@
                     <label><input type="checkbox" id="showCorridorIntersects"> Corridor Intersects</label>
                     <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
                 `,
-                legend: `
+                    legend: `
                     <h4>Conflict Levels</h4>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff2317"></div><span>High Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #A7C635"></div><span>Potential Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
                     <hr style="margin: 10px 0;">
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `
