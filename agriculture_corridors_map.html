@@ -53,70 +53,68 @@
         const bufferDistances = [500, 1000, 2000, 4000, 6000];
         const bufferOpacities = [0.8, 0.6, 0.4, 0.2, 0.1]; // Decreasing transparency
 
-        // Load micro corridors first (red with buffers) - TESTING
+        // Load micro corridors first (red with buffers)
         const corridorBaseUrl = window.location.origin + '/LUCIS-KAZA/Data/KAZA_micro_corridors';
         console.log('Loading micro corridors shapefile from:', corridorBaseUrl);
 
         shp(corridorBaseUrl)
             .then(corridorGeojson => {
-                console.log('Successfully loaded corridors, features:', corridorGeojson ? corridorGeojson.features.length : 'unknown');
-                    console.log('Loaded micro corridors:', corridorGeojson.features.length, 'features');
+                console.log('Loaded micro corridors:', corridorGeojson.features.length, 'features');
 
-                    // Add solid micro corridors in red
-                    const corridorsLayer = L.geoJSON(corridorGeojson, {
+                // Add solid micro corridors in red
+                const corridorsLayer = L.geoJSON(corridorGeojson, {
+                    style: {
+                        color: '#dc3545',
+                        weight: 3,
+                        opacity: 1,
+                        fillColor: '#dc3545',
+                        fillOpacity: 1
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const length = turf.length(feature.geometry, {units: 'kilometers'});
+                        layer.bindPopup(`<b>Micro Corridor</b><br>Length: ${length.toFixed(2)} km`);
+                    }
+                });
+
+                corridorsLayer.addTo(map);
+                console.log('Added micro corridors to map');
+
+                // Create distance buffers with decreasing transparency
+                createBuffers(corridorGeojson);
+
+                document.getElementById('status').textContent = 'Loading agriculture fields...';
+
+                // Load agriculture fields (green)
+                const agriBaseUrl = window.location.origin + '/LUCIS-KAZA/Data/Agri_fields';
+                console.log('Loading agriculture shapefile from:', agriBaseUrl);
+
+                return shp(agriBaseUrl).then(agriGeojson => {
+                    console.log('Loaded agriculture fields:', agriGeojson.features.length, 'features');
+
+                    // Add agriculture fields in green
+                    const agriLayer = L.geoJSON(agriGeojson, {
                         style: {
-                            color: '#dc3545',
-                            weight: 3,
+                            color: '#28a745',
+                            weight: 1,
                             opacity: 1,
-                            fillColor: '#dc3545',
-                            fillOpacity: 1
+                            fillColor: '#28a745',
+                            fillOpacity: 0.7
                         },
                         onEachFeature: function(feature, layer) {
-                            const length = turf.length(feature.geometry, {units: 'kilometers'});
-                            layer.bindPopup(`<b>Micro Corridor</b><br>Length: ${length.toFixed(2)} km`);
+                            const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
+                            layer.bindPopup(`<b>Agriculture Field</b><br>Area: ${area.toFixed(2)} km²`);
                         }
                     });
 
-                    corridorsLayer.addTo(map);
-                    console.log('Added micro corridors to map');
+                    agriLayer.addTo(map);
+                    console.log('Added agriculture fields to map');
 
-                    // Create distance buffers with decreasing transparency
-                    createBuffers(corridorGeojson);
+                    // Fit map to show both layers
+                    const allLayers = [agriLayer, corridorsLayer];
+                    const group = new L.featureGroup(allLayers);
+                    map.fitBounds(group.getBounds(), { padding: [20, 20] });
 
-                    document.getElementById('status').textContent = 'Loading agriculture fields...';
-
-                    // Load agriculture fields (green)
-                    const agriBaseUrl = window.location.origin + '/LUCIS-KAZA/Data/Agri_fields';
-                    console.log('Loading agriculture shapefile from:', agriBaseUrl);
-
-                    return shp(agriBaseUrl).then(agriGeojson => {
-                        console.log('Loaded agriculture fields:', agriGeojson.features.length, 'features');
-
-                        // Add agriculture fields in green
-                        const agriLayer = L.geoJSON(agriGeojson, {
-                            style: {
-                                color: '#28a745',
-                                weight: 1,
-                                opacity: 1,
-                                fillColor: '#28a745',
-                                fillOpacity: 0.7
-                            },
-                            onEachFeature: function(feature, layer) {
-                                const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
-                                layer.bindPopup(`<b>Agriculture Field</b><br>Area: ${area.toFixed(2)} km²`);
-                            }
-                        });
-
-                        agriLayer.addTo(map);
-                        console.log('Added agriculture fields to map');
-
-                        // Fit map to show both layers
-                        const allLayers = [agriLayer, corridorsLayer];
-                        const group = new L.featureGroup(allLayers);
-                        map.fitBounds(group.getBounds(), { padding: [20, 20] });
-
-                        document.getElementById('status').textContent = 'Map loaded successfully';
-                    });
+                    document.getElementById('status').textContent = 'Map loaded successfully';
                 });
             })
             .catch(error => {
