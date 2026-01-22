@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAZA Agriculture Fields & Micro Corridors</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .map-container { height: calc(100vh - 80px); position: relative; }
+        #map { height: 100%; width: 100%; }
+        .legend { position: absolute; bottom: 10px; left: 10px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+        .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
+        .status { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KAZA Agriculture Fields & Sensitivity Corridors</h1>
+        <p>Green agriculture fields with pre-buffered corridors in different shades of red</p>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+
+        <div class="status" id="status">Loading agriculture data...</div>
+
+        <div class="controls">
+            <h4>Layer Controls</h4>
+            <div class="layer-controls">
+                <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
+                <label><input type="checkbox" id="showAgriculture" checked> Agriculture Fields</label>
+                <label><input type="checkbox" id="showCorridors" checked> Sensitivity Corridors</label>
+                <label><input type="checkbox" id="showIntersects" checked> Corridor Intersects</label>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h4>Map Legend</h4>
+            <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/shpjs@4.0.4/dist/shp.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([-18.5, 23.5], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Layer storage
+        let boundaryLayer;
+        let agriLayer;
+        let corridorsLayer;
+        let intersectsLayer;
+
+        // Define different shades of red for styling
+        const redShades = [
+            '#ff0000', // Bright red
+            '#cc0000', // Dark red
+            '#aa0000', // Deeper red
+            '#880000', // Very dark red
+            '#660000', // Deep maroon
+            '#440000'  // Almost black red
+        ];
+
+        // Load all layers simultaneously
+        Promise.all([
+            // Load KAZA boundary (black outline)
+            fetch('https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_Boundary.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    boundaryLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#000000',
+                            weight: 3,
+                            opacity: 1,
+                            fillColor: 'transparent',
+                            fillOpacity: 0
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup('<b>KAZA Boundary</b><br>Study Area Outline');
+                        }
+                    });
+                    if (document.getElementById('showBoundary').checked) {
+                        boundaryLayer.addTo(map);
+                    }
+                    console.log('Loaded KAZA boundary');
+                }),
+
+            // Load agriculture fields (green)
+            fetch('https://jonobenjamin.github.io/LUCIS-KAZA/Data/Agri_fields_converted.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    agriLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#28a745',
+                            weight: 1,
+                            opacity: 1,
+                            fillColor: '#28a745',
+                            fillOpacity: 0.7
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(`<b>Agriculture Field</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                        }
+                    });
+                    if (document.getElementById('showAgriculture').checked) {
+                        agriLayer.addTo(map);
+                    }
+                    console.log('Loaded agriculture fields');
+                }),
+
+            // Load sensitivity corridors (different red shades)
+            fetch('https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_corridors_sensitivity_wgs84.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    let featureCounter = 0;
+                    corridorsLayer = L.geoJSON(geojson, {
+                        style: function(feature) {
+                            const shadeIndex = featureCounter++ % redShades.length;
+                            return {
+                                color: redShades[shadeIndex],
+                                weight: 2,
+                                opacity: 1,
+                                fillColor: redShades[shadeIndex],
+                                fillOpacity: 0.8
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const props = feature.properties;
+                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>ID:</strong> ${props.id || 'N/A'}`);
+                        }
+                    });
+                    if (document.getElementById('showCorridors').checked) {
+                        corridorsLayer.addTo(map);
+                    }
+                    console.log('Loaded sensitivity corridors');
+                }),
+
+            // Load corridor intersects (bold black)
+            fetch('https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_corridors_intersect.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    intersectsLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#000000',
+                            weight: 4,
+                            opacity: 1,
+                            fillColor: '#000000',
+                            fillOpacity: 0.3
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(`<b>Corridor Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                        }
+                    });
+                    if (document.getElementById('showIntersects').checked) {
+                        intersectsLayer.addTo(map);
+                    }
+                    console.log('Loaded corridor intersects');
+                })
+        ])
+        .then(() => {
+            // Fit bounds to all visible layers
+            const visibleLayers = [];
+            if (boundaryLayer && document.getElementById('showBoundary').checked) visibleLayers.push(boundaryLayer);
+            if (agriLayer && document.getElementById('showAgriculture').checked) visibleLayers.push(agriLayer);
+            if (corridorsLayer && document.getElementById('showCorridors').checked) visibleLayers.push(corridorsLayer);
+            if (intersectsLayer && document.getElementById('showIntersects').checked) visibleLayers.push(intersectsLayer);
+
+            if (visibleLayers.length > 0) {
+                const group = new L.featureGroup(visibleLayers);
+                const bounds = group.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [20, 20] });
+                }
+            }
+
+            document.getElementById('status').textContent = 'All layers loaded successfully';
+        })
+        .catch(error => {
+            console.error('Error loading layers:', error);
+            document.getElementById('status').textContent = `Error: ${error.message}`;
+        });
+
+        // Layer toggle controls
+        document.getElementById('showBoundary').addEventListener('change', function(e) {
+            if (e.target.checked && boundaryLayer) {
+                map.addLayer(boundaryLayer);
+            } else if (boundaryLayer) {
+                map.removeLayer(boundaryLayer);
+            }
+        });
+
+        document.getElementById('showAgriculture').addEventListener('change', function(e) {
+            if (e.target.checked && agriLayer) {
+                map.addLayer(agriLayer);
+            } else if (agriLayer) {
+                map.removeLayer(agriLayer);
+            }
+        });
+
+        document.getElementById('showCorridors').addEventListener('change', function(e) {
+            if (e.target.checked && corridorsLayer) {
+                map.addLayer(corridorsLayer);
+            } else if (corridorsLayer) {
+                map.removeLayer(corridorsLayer);
+            }
+        });
+
+        document.getElementById('showIntersects').addEventListener('change', function(e) {
+            if (e.target.checked && intersectsLayer) {
+                map.addLayer(intersectsLayer);
+            } else if (intersectsLayer) {
+                map.removeLayer(intersectsLayer);
+            }
+        });
+
+        console.log('Agriculture and corridors map initialized');
+    </script>
+</body>
+</html>
