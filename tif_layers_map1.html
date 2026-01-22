@@ -68,10 +68,10 @@
             </div>
             <hr style="margin: 10px 0;">
             <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 1 (High Priority)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 2</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 3</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 4 (Buffers)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
         </div>
     </div>
 
@@ -276,12 +276,12 @@
                 .then(geojson => {
                     corridorsLayer = L.geoJSON(geojson, {
                         style: function(feature) {
-                            const rank = feature.properties.Rank || 4;
-                            // Higher rank = more transparent (buffers/extensions)
-                            // Lower rank = more visible (main corridors)
-                            const opacity = rank === 1 ? 1.0 : rank === 2 ? 0.7 : rank === 3 ? 0.4 : 0.2;
-                            const fillOpacity = rank === 1 ? 0.8 : rank === 2 ? 0.5 : rank === 3 ? 0.3 : 0.1;
-                            const weight = rank === 1 ? 3 : rank === 2 ? 2 : rank === 3 ? 1 : 0.5;
+                            const rank = feature.properties.Rank || 1;
+                            // Higher rank = more visible (main corridors)
+                            // Lower rank = more transparent (buffers/extensions)
+                            const opacity = rank === 4 ? 1.0 : rank === 3 ? 0.7 : rank === 2 ? 0.4 : 0.2;
+                            const fillOpacity = rank === 4 ? 0.8 : rank === 3 ? 0.5 : rank === 2 ? 0.3 : 0.1;
+                            const weight = rank === 4 ? 3 : rank === 3 ? 2 : rank === 2 ? 1 : 0.5;
 
                             return {
                                 color: '#ff0000',
@@ -294,7 +294,7 @@
                         onEachFeature: function(feature, layer) {
                             const props = feature.properties;
                             const rank = props.Rank || 'Unknown';
-                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>Rank:</strong> ${rank}<br><strong>Priority:</strong> ${rank === 1 ? 'Highest' : rank === 2 ? 'High' : rank === 3 ? 'Medium' : 'Low (Buffer)'}`);
+                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>Rank:</strong> ${rank}<br><strong>Priority:</strong> ${rank === 4 ? 'Highest (Main Corridor)' : rank === 3 ? 'High' : rank === 2 ? 'Medium' : 'Low (Buffer)'}`);
                         }
                     });
                     if (document.getElementById('showCorridors').checked) {
