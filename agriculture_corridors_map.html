@@ -69,10 +69,9 @@
                         fillColor: '#28a745',
                         fillOpacity: 0.7
                     },
-                    onEachFeature: function(feature, layer) {
-                        const area = turf.area(feature.geometry) / 10000; // Convert m² to hectares
-                        layer.bindPopup(`<b>Agriculture Field</b><br>Area: ${area.toFixed(1)} hectares`);
-                    }
+                            onEachFeature: function(feature, layer) {
+                                layer.bindPopup(`<b>Agriculture Field</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                            }
                 });
 
                 agriLayer.addTo(map);
@@ -120,11 +119,9 @@
                                 };
                             },
                             onEachFeature: function(feature, layer) {
-                                const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
                                 const props = feature.properties;
                                 layer.bindPopup(`
                                     <b>Sensitivity Corridor</b><br>
-                                    <strong>Area:</strong> ${area.toFixed(2)} km²<br>
                                     <strong>ID:</strong> ${props.id || 'N/A'}<br>
                                     <strong>Buffer Level:</strong> Pre-buffered
                                 `);
