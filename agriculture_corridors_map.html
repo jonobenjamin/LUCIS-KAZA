@@ -53,11 +53,17 @@
         const bufferDistances = [500, 1000, 2000, 4000, 6000];
         const bufferOpacities = [0.8, 0.6, 0.4, 0.2, 0.1]; // Decreasing transparency
 
-        // Load agriculture fields first (green) - WORKING VERSION
-        const agriBaseUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/Agri_fields';
-        console.log('Loading agriculture shapefile from:', agriBaseUrl);
+        // Load agriculture fields first (green) - ACTUAL DATA
+        const agriUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/Agri_fields_converted.geojson';
+        console.log('Loading agriculture GeoJSON from:', agriUrl);
 
-        shp(agriBaseUrl)
+        fetch(agriUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(agriGeojson => {
                 console.log('Loaded agriculture fields:', agriGeojson.features.length, 'features');
 
@@ -71,20 +77,62 @@
                         fillOpacity: 0.7
                     },
                     onEachFeature: function(feature, layer) {
-                        const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
-                        layer.bindPopup(`<b>Agriculture Field</b><br>Area: ${area.toFixed(2)} km²`);
+                        const area = turf.area(feature.geometry) / 10000; // Convert m² to hectares
+                        layer.bindPopup(`<b>Agriculture Field</b><br>Area: ${area.toFixed(1)} hectares`);
                     }
                 });
 
                 agriLayer.addTo(map);
                 console.log('Added agriculture fields to map');
 
-                document.getElementById('status').textContent = 'Agriculture fields loaded successfully';
+                document.getElementById('status').textContent = 'Loading micro corridors...';
+
+                // Load micro corridors with buffers - ACTUAL DATA
+                const corridorsUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_micro_corridors_converted.geojson';
+                console.log('Loading corridors GeoJSON from:', corridorsUrl);
+
+                return fetch(corridorsUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(corridorsGeojson => {
+                        console.log('Loaded micro corridors:', corridorsGeojson.features.length, 'features');
+
+                        // Add solid micro corridors in red
+                        const corridorsLayer = L.geoJSON(corridorsGeojson, {
+                            style: {
+                                color: '#dc3545',
+                                weight: 3,
+                                opacity: 1,
+                                fillColor: '#dc3545',
+                                fillOpacity: 1
+                            },
+                            onEachFeature: function(feature, layer) {
+                                const length = feature.properties.length_km;
+                                layer.bindPopup(`<b>Micro Corridor</b><br>Length: ${length} km`);
+                            }
+                        });
+
+                        corridorsLayer.addTo(map);
+                        console.log('Added micro corridors to map');
+
+                        // Create distance buffers with decreasing transparency
+                        createBuffers(corridorsGeojson);
+
+                        // Fit map to show both layers
+                        const allLayers = [agriLayer, corridorsLayer];
+                        const group = new L.featureGroup(allLayers);
+                        map.fitBounds(group.getBounds(), { padding: [20, 20] });
+
+                        document.getElementById('status').textContent = 'Map loaded successfully';
+                    });
             })
             .catch(error => {
                 console.error('Error loading agriculture or corridor data:', error);
-                console.error('Error details:', error);
-                document.getElementById('status').textContent = `Error loading data: ${error.message}`;
+                document.getElementById('status').textContent = `Error: ${error.message}`;
             });
 
         // Create distance buffers with decreasing transparency
