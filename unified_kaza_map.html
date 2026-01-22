@@ -118,7 +118,7 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff4500; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `
             },
             {
@@ -168,7 +168,7 @@
                     lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
                     corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
                     corridorIntersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
-                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#ff4500', weight: 4, opacity: 1, fillColor: '#ff4500', fillOpacity: 0.3 } }
+                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
                 },
                 controls: `
                     <label><input type="checkbox" id="showCorridors" checked> Sensitivity Corridors</label>
@@ -184,7 +184,7 @@
                     <hr style="margin: 10px 0;">
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff4500; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `
             }
         ];
@@ -510,8 +510,12 @@
                     else if (currentLayers.intersects) map.removeLayer(currentLayers.intersects);
                 });
                 document.getElementById('showUrbanIntersects').addEventListener('change', function() {
-                    if (this.checked && currentLayers.urbanIntersects) map.addLayer(currentLayers.urbanIntersects);
-                    else if (currentLayers.urbanIntersects) map.removeLayer(currentLayers.urbanIntersects);
+                    if (this.checked && currentLayers.urbanIntersects) {
+                        map.addLayer(currentLayers.urbanIntersects);
+                        currentLayers.urbanIntersects.bringToFront();
+                    } else if (currentLayers.urbanIntersects) {
+                        map.removeLayer(currentLayers.urbanIntersects);
+                    }
                 });
             } else if (configIndex === 2) { // TIFF
                 // TIFF layer buttons
@@ -543,12 +547,20 @@
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
                 });
                 document.getElementById('showCorridorIntersects').addEventListener('change', function() {
-                    if (this.checked && currentLayers.corridorIntersects) map.addLayer(currentLayers.corridorIntersects);
-                    else if (currentLayers.corridorIntersects) map.removeLayer(currentLayers.corridorIntersects);
+                    if (this.checked && currentLayers.corridorIntersects) {
+                        map.addLayer(currentLayers.corridorIntersects);
+                        currentLayers.corridorIntersects.bringToFront();
+                    } else if (currentLayers.corridorIntersects) {
+                        map.removeLayer(currentLayers.corridorIntersects);
+                    }
                 });
                 document.getElementById('showUrbanIntersects').addEventListener('change', function() {
-                    if (this.checked && currentLayers.urbanIntersects) map.addLayer(currentLayers.urbanIntersects);
-                    else if (currentLayers.urbanIntersects) map.removeLayer(currentLayers.urbanIntersects);
+                    if (this.checked && currentLayers.urbanIntersects) {
+                        map.addLayer(currentLayers.urbanIntersects);
+                        currentLayers.urbanIntersects.bringToFront();
+                    } else if (currentLayers.urbanIntersects) {
+                        map.removeLayer(currentLayers.urbanIntersects);
+                    }
                 });
             }
         }
