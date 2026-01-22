@@ -165,15 +165,26 @@
                 title: "LUCIS KAZA Conflict Analysis Map",
                 subtitle: "Color-coded by conflict codes from the conflict codes reference",
                 layers: {
-                    lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' }
+                    lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
+                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
+                    corridorIntersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
+                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#ff4500', weight: 4, opacity: 1, fillColor: '#ff4500', fillOpacity: 0.3 } }
                 },
-                controls: '',
+                controls: `
+                    <label><input type="checkbox" id="showCorridors" checked> Sensitivity Corridors</label>
+                    <label><input type="checkbox" id="showCorridorIntersects"> Corridor Intersects</label>
+                    <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
+                `,
                 legend: `
                     <h4>Conflict Levels</h4>
                     <div class="legend-item"><div class="legend-color" style="background-color: #ff2317"></div><span>High Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #A7C635"></div><span>Potential Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
+                    <hr style="margin: 10px 0;">
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff4500; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `
             }
         ];
@@ -525,6 +536,19 @@
                 document.getElementById('showCorridors').addEventListener('change', function() {
                     if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+            } else if (configIndex === 3) { // LUCIS
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+                document.getElementById('showCorridorIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridorIntersects) map.addLayer(currentLayers.corridorIntersects);
+                    else if (currentLayers.corridorIntersects) map.removeLayer(currentLayers.corridorIntersects);
+                });
+                document.getElementById('showUrbanIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.urbanIntersects) map.addLayer(currentLayers.urbanIntersects);
+                    else if (currentLayers.urbanIntersects) map.removeLayer(currentLayers.urbanIntersects);
                 });
             }
         }
