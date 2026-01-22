@@ -78,7 +78,7 @@
         // Load all layers simultaneously - CORRECT LAYERING ORDER
         Promise.all([
             // Load urban areas FIRST (bottom layer - gray) - FILTERED TO KAZA BOUNDARY
-            fetch('./Data/KAZA_urban_areas_within_boundary.geojson')
+            fetch('./Data/KAZA_urban_areas.geojson')
                 .then(r => r.json())
                 .then(geojson => {
                     urbanLayer = L.geoJSON(geojson, {
