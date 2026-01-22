@@ -47,7 +47,10 @@
             <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
             <hr style="margin: 10px 0;">
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
         </div>
@@ -68,15 +71,6 @@
         let corridorIntersectsLayer;
         let urbanIntersectsLayer;
 
-        // Define different shades of red for styling
-        const redShades = [
-            '#ff0000', // Bright red
-            '#cc0000', // Dark red
-            '#aa0000', // Deeper red
-            '#880000', // Very dark red
-            '#660000', // Deep maroon
-            '#440000'  // Almost black red
-        ];
 
         // Conflict code to color mapping based on Excel data
         const conflictCodeColors = {
@@ -194,20 +188,24 @@
             fetch('./Data/KAZA_corridors_sensitivity_wgs84.geojson')
                 .then(r => r.json())
                 .then(geojson => {
-                    let featureCounter = 0;
                     corridorsLayer = L.geoJSON(geojson, {
                         style: function(feature) {
-                            const shadeIndex = featureCounter++ % redShades.length;
+                            const rank = feature.properties.Rank || 1;
+                            const opacity = rank === 4 ? 1.0 : rank === 3 ? 0.7 : rank === 2 ? 0.4 : 0.2;
+                            const fillOpacity = rank === 4 ? 0.8 : rank === 3 ? 0.5 : rank === 2 ? 0.3 : 0.1;
+                            const weight = rank === 4 ? 3 : rank === 3 ? 2 : rank === 2 ? 1 : 0.5;
+
                             return {
-                                color: redShades[shadeIndex],
-                                weight: 2,
-                                opacity: 1,
-                                fillColor: redShades[shadeIndex],
-                                fillOpacity: 0.8
+                                color: '#ff0000',
+                                weight: weight,
+                                opacity: opacity,
+                                fillColor: '#ff0000',
+                                fillOpacity: fillOpacity
                             };
                         },
                         onEachFeature: function(feature, layer) {
-                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                            const rank = feature.properties.Rank || 'Unknown';
+                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>Rank:</strong> ${rank}<br><strong>Priority:</strong> ${rank === 4 ? 'Highest (Main Corridor)' : rank === 3 ? 'High' : rank === 2 ? 'Medium' : 'Low (Buffer)'}`);
                         }
                     });
                     console.log('Loaded sensitivity corridors');
