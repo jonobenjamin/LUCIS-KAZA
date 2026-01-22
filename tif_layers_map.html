@@ -10,14 +10,16 @@
         .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
         .map-container { height: calc(100vh - 80px); position: relative; }
         #map { height: 100%; width: 100%; }
-        .controls { position: absolute; top: 10px; right: 10px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; max-height: 80vh; overflow-y: auto; }
-        .legend { position: absolute; bottom: 10px; left: 10px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; }
+        .controls { position: absolute; top: 10px; right: 10px; background: white; padding: 12px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; max-height: 60vh; overflow-y: auto; min-width: 200px; max-width: 250px; }
+        .legend { position: absolute; bottom: 10px; left: 10px; background: white; padding: 12px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; max-height: 70vh; overflow-y: auto; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
         .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
         .status { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; }
         .layer-controls label { display: block; margin: 5px 0; }
         .tiff-selector { margin-bottom: 20px; }
-        .tiff-selector button { width: 100%; padding: 8px; margin: 2px 0; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px; }
+        .tiff-selector h5 { margin-bottom: 8px; font-size: 14px; }
+        .tiff-selector .button-group { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tiff-selector button { flex: 1; min-width: 80px; padding: 6px 8px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px; font-size: 12px; }
         .tiff-selector button.active { background: #007bff; color: white; border-color: #007bff; }
         .tiff-selector button:hover { background: #e9ecef; }
     </style>
@@ -38,11 +40,13 @@
 
             <div class="tiff-selector">
                 <h5>Select TIFF Layer</h5>
-                <button id="btn-ag01" class="active">AG01 - Agriculture 1</button>
-                <button id="btn-ag02">AG02 - Agriculture 2</button>
-                <button id="btn-ag03">AG03 - Agriculture 3</button>
-                <button id="btn-ug01">UG01 - Urban Growth 1</button>
-                <button id="btn-ug02">UG02 - Urban Growth 2</button>
+                <div class="button-group">
+                    <button id="btn-ag01" class="active">AG01</button>
+                    <button id="btn-ag02">AG02</button>
+                    <button id="btn-ag03">AG03</button>
+                    <button id="btn-ug01">UG01</button>
+                    <button id="btn-ug02">UG02</button>
+                </div>
             </div>
 
             <div class="layer-controls">
@@ -63,7 +67,10 @@
             <div class="legend-item"><div class="legend-color" style="background-color: #b2182b"></div><span>Class 8 - Highest</span></div>
             <hr style="margin: 10px 0;">
             <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
-            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 1 (High Priority)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 2</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 3</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 4 (Buffers)</span></div>
         </div>
     </div>
 
@@ -198,16 +205,26 @@
                 .then(r => r.json())
                 .then(geojson => {
                     corridorsLayer = L.geoJSON(geojson, {
-                        style: {
-                            color: '#ff0000',
-                            weight: 2,
-                            opacity: 1,
-                            fillColor: '#ff0000',
-                            fillOpacity: 0.8
+                        style: function(feature) {
+                            const rank = feature.properties.Rank || 4;
+                            // Higher rank = more transparent (buffers/extensions)
+                            // Lower rank = more visible (main corridors)
+                            const opacity = rank === 1 ? 1.0 : rank === 2 ? 0.7 : rank === 3 ? 0.4 : 0.2;
+                            const fillOpacity = rank === 1 ? 0.8 : rank === 2 ? 0.5 : rank === 3 ? 0.3 : 0.1;
+                            const weight = rank === 1 ? 3 : rank === 2 ? 2 : rank === 3 ? 1 : 0.5;
+
+                            return {
+                                color: '#ff0000',
+                                weight: weight,
+                                opacity: opacity,
+                                fillColor: '#ff0000',
+                                fillOpacity: fillOpacity
+                            };
                         },
                         onEachFeature: function(feature, layer) {
                             const props = feature.properties;
-                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>ID:</strong> ${props.id || 'N/A'}`);
+                            const rank = props.Rank || 'Unknown';
+                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>Rank:</strong> ${rank}<br><strong>Priority:</strong> ${rank === 1 ? 'Highest' : rank === 2 ? 'High' : rank === 3 ? 'Medium' : 'Low (Buffer)'}`);
                         }
                     });
                     if (document.getElementById('showCorridors').checked) {
