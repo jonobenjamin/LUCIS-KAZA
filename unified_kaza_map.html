@@ -23,8 +23,10 @@
         .tiff-selector button { flex: 1; min-width: 80px; padding: 6px 8px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px; font-size: 12px; }
         .tiff-selector button.active { background: #007bff; color: white; border-color: #007bff; }
         .tiff-selector button:hover { background: #e9ecef; }
-        .next-map-btn { position: absolute; top: 50%; right: 320px; transform: translateY(-50%); background: #007bff; color: white; border: none; padding: 15px 20px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 1000; font-size: 18px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-        .next-map-btn:hover { background: #0056b3; transform: translateY(-50%) scale(1.05); }
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #007bff; color: white; border: none; padding: 15px 20px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 1000; font-size: 18px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn:hover { background: #0056b3; transform: translateY(-50%) scale(1.05); }
+        .back-btn { left: 10px; }
+        .next-btn { right: 10px; }
         .map-title { font-size: 16px; margin: 0; padding: 0; }
         .map-subtitle { font-size: 12px; margin: 5px 0 15px 0; color: #666; }
     </style>
@@ -38,7 +40,8 @@
     <div class="map-container">
         <div id="map"></div>
 
-        <button class="next-map-btn" id="nextMapBtn" title="Next Map View">▶</button>
+        <button class="nav-btn back-btn" id="backMapBtn" title="Previous Map View">◀</button>
+        <button class="nav-btn next-btn" id="nextMapBtn" title="Next Map View">▶</button>
 
         <div class="status" id="status">Loading agriculture data...</div>
 
@@ -97,7 +100,7 @@
                 subtitle: "Urban areas with corridors on top, boundary outline, and urban-corridor intersects",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
-                    urban: { show: true, file: './Data/KAZA_urban_areas_within_boundary.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
+                    urban: { show: true, file: './Data/KAZA_urban_areas.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
                     corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
                     intersects: { show: true, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
                     urbanIntersects: { show: true, file: './Data/corridor_urban_intersect.geojson', style: { color: '#ff4500', weight: 4, opacity: 1, fillColor: '#ff4500', fillOpacity: 0.3 } }
@@ -572,9 +575,14 @@
                 });
         }
 
-        // Next map button functionality
+        // Navigation button functionality
         document.getElementById('nextMapBtn').addEventListener('click', function() {
             currentMapIndex = (currentMapIndex + 1) % mapConfigs.length;
+            loadMapConfig(currentMapIndex);
+        });
+
+        document.getElementById('backMapBtn').addEventListener('click', function() {
+            currentMapIndex = (currentMapIndex - 1 + mapConfigs.length) % mapConfigs.length;
             loadMapConfig(currentMapIndex);
         });
 
