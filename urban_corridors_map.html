@@ -36,6 +36,7 @@
                 <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
                 <label><input type="checkbox" id="showCorridors" checked> Sensitivity Corridors</label>
                 <label><input type="checkbox" id="showIntersects" checked> Corridor Intersects</label>
+                <label><input type="checkbox" id="showUrbanIntersects" checked> Corridor-Urban Intersects</label>
             </div>
         </div>
 
@@ -45,6 +46,7 @@
             <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
             <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff4500; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
         </div>
     </div>
 
@@ -61,6 +63,7 @@
         let urbanLayer;
         let corridorsLayer;
         let intersectsLayer;
+        let urbanIntersectsLayer;
 
         // Define different shades of red for styling
         const redShades = [
@@ -145,6 +148,34 @@
                     console.log('Loaded corridor intersects (top layer)');
                 }),
 
+            // Load corridor-urban intersects (orange-red, on top)
+            fetch('./Data/corridor_urban_intersects_actual.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    urbanIntersectsLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#000000',
+                            weight: 3,
+                            opacity: 1,
+                            fillColor: '#ff4500',
+                            fillOpacity: 0.8
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const props = feature.properties;
+                            layer.bindPopup(`
+                                <b>Corridor-Urban Intersect</b><br>
+                                <strong>Corridor:</strong> ${props.corridor_id}<br>
+                                <strong>Urban Area:</strong> ${props.urban_id}<br>
+                                <strong>Conflict Level:</strong> ${props.conflict_level}
+                            `);
+                        }
+                    });
+                    if (document.getElementById('showUrbanIntersects').checked) {
+                        urbanIntersectsLayer.addTo(map);
+                    }
+                    console.log('Loaded corridor-urban intersects');
+                }),
+
             // Load KAZA boundary LAST (outline on top)
             fetch('./Data/KAZA_Boundary.geojson')
                 .then(r => r.json())
@@ -174,6 +205,7 @@
             if (urbanLayer && document.getElementById('showUrban').checked) visibleLayers.push(urbanLayer);
             if (corridorsLayer && document.getElementById('showCorridors').checked) visibleLayers.push(corridorsLayer);
             if (intersectsLayer && document.getElementById('showIntersects').checked) visibleLayers.push(intersectsLayer);
+            if (urbanIntersectsLayer && document.getElementById('showUrbanIntersects').checked) visibleLayers.push(urbanIntersectsLayer);
 
             if (visibleLayers.length > 0) {
                 const group = new L.featureGroup(visibleLayers);
@@ -220,6 +252,14 @@
                 map.addLayer(intersectsLayer);
             } else if (intersectsLayer) {
                 map.removeLayer(intersectsLayer);
+            }
+        });
+
+        document.getElementById('showUrbanIntersects').addEventListener('change', function(e) {
+            if (e.target.checked && urbanIntersectsLayer) {
+                map.addLayer(urbanIntersectsLayer);
+            } else if (urbanIntersectsLayer) {
+                map.removeLayer(urbanIntersectsLayer);
             }
         });
 
