@@ -166,7 +166,7 @@
                 subtitle: "Color-coded by conflict codes from the conflict codes reference",
                 layers: {
                     lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
-                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
+                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'redShades' },
                     corridorIntersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
                     urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
                 },
@@ -369,7 +369,7 @@
             let featureCounter = 0;
 
             Object.entries(config.layers).forEach(([layerKey, layerConfig]) => {
-                if (!layerConfig.show) return;
+                // Load all layers, visibility controlled by checkboxes
 
                 if (layerConfig.file === 'shp') {
                     // Special handling for shapefile
@@ -397,6 +397,9 @@
                                 });
                                 currentLayers[layerKey] = layer;
                                 if (layerConfig.show) layer.addTo(map);
+                                if ((layerKey.includes('Intersects') || layerKey.includes('intersects')) && map.hasLayer(layer)) {
+                                    layer.bringToFront();
+                                }
                                 resolve();
                             }).catch(error => {
                                 console.error(`Error loading ${layerKey}:`, error);
@@ -449,6 +452,9 @@
 
                                 currentLayers[layerKey] = layer;
                                 if (layerConfig.show) layer.addTo(map);
+                                if ((layerKey.includes('Intersects') || layerKey.includes('intersects')) && map.hasLayer(layer)) {
+                                    layer.bringToFront();
+                                }
                             })
                             .catch(error => {
                                 console.error(`Error loading ${layerKey}:`, error);
@@ -622,11 +628,17 @@
             loadMapConfig(currentMapIndex);
         });
 
-        // Ensure corridors are always on top
+        // Ensure intersection layers are always on top, then corridors
         map.on('layeradd', function() {
-            // Bring corridors to front if they exist
+            // First bring intersection layers to the very front
             Object.keys(currentLayers).forEach(key => {
-                if (key.includes('corridor') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                if ((key.includes('Intersects') || key.includes('intersects')) && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                    currentLayers[key].bringToFront();
+                }
+            });
+            // Then bring other corridor layers to front (but below intersections)
+            Object.keys(currentLayers).forEach(key => {
+                if (key.includes('corridor') && !key.includes('Intersects') && !key.includes('intersects') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
                     currentLayers[key].bringToFront();
                 }
             });
