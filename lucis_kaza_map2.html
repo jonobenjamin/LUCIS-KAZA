@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUCIS KAZA Conflict Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- GitHub Pages compatible: Uses GeoJSON data from ./Data/ folder -->
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .map-container { height: calc(100vh - 80px); position: relative; }
+        #map { height: 100%; width: 100%; }
+        .legend { position: absolute; bottom: 10px; right: 10px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; max-height: 70vh; overflow-y: auto; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+        .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
+        .status { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; }
+        .controls { position: absolute; top: 10px; right: 10px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; min-width: 200px; }
+        .layer-controls label { display: block; margin: 5px 0; font-size: 14px; }
+        .layer-controls input[type="checkbox"] { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LUCIS KAZA Conflict Analysis Map</h1>
+        <p>Color-coded by conflict codes from the conflict codes reference</p>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+
+        <div class="status" id="status">Loading KAZA shapefile...</div>
+
+        <div class="controls">
+            <h4>Layer Controls</h4>
+            <div class="layer-controls">
+                <label><input type="checkbox" id="showCorridors"> Sensitivity Corridors</label>
+                <label><input type="checkbox" id="showCorridorIntersects"> Corridor Intersects</label>
+                <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h4>Conflict Levels</h4>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff2317"></div><span>High Conflict</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #A7C635"></div><span>Potential Conflict</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
+            <hr style="margin: 10px 0;">
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Sensitivity Corridors</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+            <div class="legend-item"><div class="legend-color" style="background-color: #ff4500; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="https://unpkg.com/shpjs@4.0.4/dist/shp.js"></script>
+    <script>
+        // Initialize map centered on KAZA region
+        const map = L.map('map').setView([-18.0, 23.0], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Layer storage
+        let corridorsLayer;
+        let corridorIntersectsLayer;
+        let urbanIntersectsLayer;
+
+        // Define different shades of red for styling
+        const redShades = [
+            '#ff0000', // Bright red
+            '#cc0000', // Dark red
+            '#aa0000', // Deeper red
+            '#880000', // Very dark red
+            '#660000', // Deep maroon
+            '#440000'  // Almost black red
+        ];
+
+        // Conflict code to color mapping based on Excel data
+        const conflictCodeColors = {
+            111: '#7BBB3F',    // Low Conflict
+            112: '#C5D79B',    // No Conflict
+            113: '#C5D79B',    // No Conflict
+            121: '#C5D79B',    // No Conflict
+            122: '#A7C635',    // Potential Conflict
+            123: '#C5D79B',    // No Conflict
+            131: '#C5D79B',    // No Conflict
+            132: '#C5D79B',    // No Conflict
+            133: '#C5D79B',    // No Conflict
+            211: '#C5D79B',    // No Conflict
+            212: '#A7C635',    // Potential Conflict
+            213: '#C5D79B',    // No Conflict
+            221: '#A7C635',    // Potential Conflict
+            222: '#A7C635',    // Potential Conflict
+            223: '#C5D79B',    // No Conflict
+            231: '#C5D79B',    // No Conflict
+            232: '#C5D79B',    // No Conflict
+            233: '#A7C635',    // Potential Conflict
+            311: '#C5D79B',    // No Conflict
+            312: '#A7C635',    // Potential Conflict
+            313: '#A7C635',    // Potential Conflict
+            321: '#C5D79B',    // No Conflict
+            322: '#C5D79B',    // No Conflict
+            323: '#A7C635',    // Potential Conflict
+            331: '#C5D79B',    // No Conflict
+            332: '#A7C635',    // Potential Conflict
+            333: '#ff2317'     // High Conflict
+        };
+
+        // Conflict level mapping for display
+        const conflictLevels = {
+            '#ff2317': 'High Conflict',
+            '#A7C635': 'Potential Conflict',
+            '#7BBB3F': 'Low Conflict',
+            '#C5D79B': 'No Conflict'
+        };
+
+        // Load LUCIS_KAZA shapefile directly (actual data)
+        const baseUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA';
+        console.log('Loading shapefile from:', baseUrl);
+        shp(baseUrl)
+            .then(geojson => {
+                console.log(`Loaded KAZA GeoJSON: ${geojson.features.length} features`);
+
+                const layer = L.geoJSON(geojson, {
+                    style: function(feature) {
+                        const code = parseInt(feature.properties.code); // Ensure it's a number
+                        const color = conflictCodeColors[code] || '#808080'; // Default gray for unknown codes
+                        return {
+                            color: color,
+                            weight: 1,
+                            opacity: 1,
+                            fillColor: color,
+                            fillOpacity: 0.8
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const code = parseInt(feature.properties.code); // Ensure it's a number
+                        const color = conflictCodeColors[code] || '#808080';
+                        const conflictLevel = conflictLevels[color] || 'Unknown';
+                        const area = turf.area(feature.geometry) / 1000000; // Convert m² to km²
+
+                        const popupContent = `
+                            <b>LUCIS KAZA Region</b><br>
+                            <strong>Code:</strong> ${code}<br>
+                            <strong>Conflict Level:</strong> ${conflictLevel}<br>
+                            <strong>Area:</strong> ${area.toFixed(2)} km²<br>
+                            <div style="width: 20px; height: 20px; background-color: ${color}; border: 1px solid #ccc; display: inline-block; margin-right: 5px;"></div>
+                            <strong>Hex Color:</strong> ${color}
+                        `;
+                        layer.bindPopup(popupContent);
+
+                        // Add hover effects
+                        layer.on('mouseover', function(e) {
+                            this.setStyle({
+                                weight: 3,
+                                fillOpacity: 1
+                            });
+                        });
+                        layer.on('mouseout', function(e) {
+                            this.setStyle({
+                                weight: 1,
+                                fillOpacity: 0.8
+                            });
+                        });
+                    }
+                });
+
+                layer.addTo(map);
+
+                // Fit bounds with a small delay to ensure rendering
+                setTimeout(() => {
+                    try {
+                        const bounds = layer.getBounds();
+                        console.log('Fitting bounds:', bounds);
+                        map.fitBounds(bounds, { padding: [20, 20] });
+                    } catch (error) {
+                        console.error('Error fitting bounds:', error);
+                    }
+                }, 100);
+
+                document.getElementById('status').textContent = `Loaded ${geojson.features.length} features from KAZA region`;
+            })
+            .catch(error => {
+                console.error('Error loading KAZA shapefile:', error);
+                document.getElementById('status').textContent = `Error loading data: ${error.message}`;
+            });
+
+        // Load additional layers
+        Promise.all([
+            // Load sensitivity corridors
+            fetch('./Data/KAZA_corridors_sensitivity_wgs84.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    let featureCounter = 0;
+                    corridorsLayer = L.geoJSON(geojson, {
+                        style: function(feature) {
+                            const shadeIndex = featureCounter++ % redShades.length;
+                            return {
+                                color: redShades[shadeIndex],
+                                weight: 2,
+                                opacity: 1,
+                                fillColor: redShades[shadeIndex],
+                                fillOpacity: 0.8
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                        }
+                    });
+                    console.log('Loaded sensitivity corridors');
+                }),
+
+            // Load corridor intersects
+            fetch('./Data/KAZA_corridors_intersect_wgs84.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    corridorIntersectsLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#000000',
+                            weight: 4,
+                            opacity: 1,
+                            fillColor: '#000000',
+                            fillOpacity: 0.3
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(`<b>Corridor Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                        }
+                    });
+                    console.log('Loaded corridor intersects');
+                }),
+
+            // Load urban intersects
+            fetch('./Data/corridor_urban_intersect.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    urbanIntersectsLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#ff4500',
+                            weight: 4,
+                            opacity: 1,
+                            fillColor: '#ff4500',
+                            fillOpacity: 0.3
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(`<b>Corridor-Urban Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                        }
+                    });
+                    console.log('Loaded urban intersects');
+                })
+        ]).then(() => {
+            console.log('All additional layers loaded');
+        }).catch(error => {
+            console.error('Error loading additional layers:', error);
+        });
+
+        // Event listeners for layer controls
+        document.getElementById('showCorridors').addEventListener('change', function() {
+            if (this.checked && corridorsLayer) {
+                corridorsLayer.addTo(map);
+                corridorsLayer.bringToFront();
+            } else if (corridorsLayer) {
+                map.removeLayer(corridorsLayer);
+            }
+        });
+
+        document.getElementById('showCorridorIntersects').addEventListener('change', function() {
+            if (this.checked && corridorIntersectsLayer) {
+                corridorIntersectsLayer.addTo(map);
+                corridorIntersectsLayer.bringToFront();
+            } else if (corridorIntersectsLayer) {
+                map.removeLayer(corridorIntersectsLayer);
+            }
+        });
+
+        document.getElementById('showUrbanIntersects').addEventListener('change', function() {
+            if (this.checked && urbanIntersectsLayer) {
+                urbanIntersectsLayer.addTo(map);
+                urbanIntersectsLayer.bringToFront();
+            } else if (urbanIntersectsLayer) {
+                map.removeLayer(urbanIntersectsLayer);
+            }
+        });
+
+        console.log('KAZA conflict map initialized');
+    </script>
+</body>
+</html>
