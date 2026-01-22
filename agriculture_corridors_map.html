@@ -71,31 +71,9 @@
             '#440000'  // Almost black red
         ];
 
-        // Load all layers simultaneously
+        // Load all layers simultaneously - CORRECT LAYERING ORDER
         Promise.all([
-            // Load KAZA boundary (black outline)
-            fetch('./Data/KAZA_Boundary.geojson')
-                .then(r => r.json())
-                .then(geojson => {
-                    boundaryLayer = L.geoJSON(geojson, {
-                        style: {
-                            color: '#000000',
-                            weight: 3,
-                            opacity: 1,
-                            fillColor: 'transparent',
-                            fillOpacity: 0
-                        },
-                        onEachFeature: function(feature, layer) {
-                            layer.bindPopup('<b>KAZA Boundary</b><br>Study Area Outline');
-                        }
-                    });
-                    if (document.getElementById('showBoundary').checked) {
-                        boundaryLayer.addTo(map);
-                    }
-                    console.log('Loaded KAZA boundary');
-                }),
-
-            // Load agriculture fields (green)
+            // Load agriculture fields FIRST (bottom layer)
             fetch('./Data/Agri_fields_converted.geojson')
                 .then(r => r.json())
                 .then(geojson => {
@@ -114,10 +92,10 @@
                     if (document.getElementById('showAgriculture').checked) {
                         agriLayer.addTo(map);
                     }
-                    console.log('Loaded agriculture fields');
+                    console.log('Loaded agriculture fields (bottom layer)');
                 }),
 
-            // Load sensitivity corridors (different red shades)
+            // Load sensitivity corridors SECOND (on top of agriculture)
             fetch('./Data/KAZA_corridors_sensitivity_wgs84.geojson')
                 .then(r => r.json())
                 .then(geojson => {
@@ -141,10 +119,10 @@
                     if (document.getElementById('showCorridors').checked) {
                         corridorsLayer.addTo(map);
                     }
-                    console.log('Loaded sensitivity corridors');
+                    console.log('Loaded sensitivity corridors (middle layer)');
                 }),
 
-            // Load corridor intersects (bold black)
+            // Load corridor intersects THIRD (on top of corridors)
             fetch('./Data/KAZA_corridors_intersect_wgs84.geojson')
                 .then(r => r.json())
                 .then(geojson => {
@@ -163,7 +141,29 @@
                     if (document.getElementById('showIntersects').checked) {
                         intersectsLayer.addTo(map);
                     }
-                    console.log('Loaded corridor intersects');
+                    console.log('Loaded corridor intersects (top layer)');
+                }),
+
+            // Load KAZA boundary LAST (outline on top)
+            fetch('./Data/KAZA_Boundary.geojson')
+                .then(r => r.json())
+                .then(geojson => {
+                    boundaryLayer = L.geoJSON(geojson, {
+                        style: {
+                            color: '#000000',
+                            weight: 3,
+                            opacity: 1,
+                            fillColor: 'transparent',
+                            fillOpacity: 0
+                        },
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup('<b>KAZA Boundary</b><br>Study Area Outline');
+                        }
+                    });
+                    if (document.getElementById('showBoundary').checked) {
+                        boundaryLayer.addTo(map);
+                    }
+                    console.log('Loaded KAZA boundary (outline)');
                 })
         ])
         .then(() => {
