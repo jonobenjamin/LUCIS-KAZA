@@ -79,8 +79,8 @@
 
                 document.getElementById('status').textContent = 'Loading micro corridors...';
 
-                // Load pre-buffered corridors with different shades of red - ACTUAL DATA
-                const corridorsUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_corridors_sensitivity.geojson';
+                // Load pre-buffered corridors with different shades of red - ACTUAL DATA (WGS84)
+                const corridorsUrl = 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/KAZA_corridors_sensitivity_wgs84.geojson';
                 console.log('Loading pre-buffered corridors from:', corridorsUrl);
 
                 return fetch(corridorsUrl)
@@ -131,10 +131,24 @@
                         corridorsLayer.addTo(map);
                         console.log('Added sensitivity corridors with red shades');
 
-                        // Fit map to show both layers
-                        const allLayers = [agriLayer, corridorsLayer];
-                        const group = new L.featureGroup(allLayers);
-                        map.fitBounds(group.getBounds(), { padding: [20, 20] });
+                        // Set map view to KAZA region and fit bounds
+                        try {
+                            const allLayers = [agriLayer, corridorsLayer];
+                            const group = new L.featureGroup(allLayers);
+                            const bounds = group.getBounds();
+                            console.log('Data bounds:', bounds);
+
+                            if (bounds.isValid()) {
+                                map.fitBounds(bounds, { padding: [20, 20] });
+                                console.log('Fitted bounds to data');
+                            } else {
+                                console.log('Invalid bounds, setting default view');
+                                map.setView([-18.5, 23.5], 8);
+                            }
+                        } catch (boundsError) {
+                            console.error('Error fitting bounds:', boundsError);
+                            map.setView([-18.5, 23.5], 8);
+                        }
 
                         document.getElementById('status').textContent = 'Map loaded successfully';
                     });
