@@ -104,11 +104,11 @@
                         ];
 
                         // Add pre-buffered corridors with different shades of red
+                        let featureCounter = 0;
                         const corridorsLayer = L.geoJSON(corridorsGeojson, {
-                            style: function(feature, layer) {
-                                // Use different shades based on feature index or properties
-                                const index = feature.properties.id ? parseInt(feature.properties.id) : layer._leaflet_id % redShades.length;
-                                const shadeIndex = index % redShades.length;
+                            style: function(feature) {
+                                // Use feature counter for consistent coloring
+                                const shadeIndex = featureCounter++ % redShades.length;
 
                                 return {
                                     color: redShades[shadeIndex],
