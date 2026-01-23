@@ -16,8 +16,10 @@
         .map-area { flex: 1; position: relative; background: #f8f9fa; overflow: hidden; }
         #map { height: 100%; width: 100%; }
         .bottom-ribbon { height: 100px; background: white; padding: 15px; border-top: 1px solid #ddd; overflow-y: auto; flex-shrink: 0; }
-        .layer-info { height: 100%; column-width: 200px; column-gap: 20px; }
-        .layer-info ul { margin: 5px 0; padding-left: 20px; list-style-type: disc; }
+        .layer-info { height: 100%; column-width: 200px; column-gap: 20px; column-fill: auto; }
+        .layer-info h4 { margin: 0 0 5px 0; break-after: avoid; }
+        .layer-info ul { margin: 0; padding-left: 20px; list-style-type: disc; }
+        .layer-info li { break-inside: avoid; line-height: 1.4; }
         .layer-info { width: 100%; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
         .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
