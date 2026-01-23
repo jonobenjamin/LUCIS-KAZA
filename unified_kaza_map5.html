@@ -14,7 +14,8 @@
         .legend { flex: 1; padding: 15px; overflow-y: auto; }
         .map-area { flex: 1; position: relative; background: #f8f9fa; height: 100%; }
         #map { height: 100%; width: 100%; }
-        .bottom-ribbon { position: absolute; bottom: 0; left: 280px; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; max-height: 200px; overflow-y: auto; }
+        .bottom-ribbon { position: fixed; bottom: 0; left: 280px; right: 0; height: 200px; background: white; padding: 15px; border-top: 1px solid #ddd; overflow: hidden; }
+        .layer-info { height: 100%; overflow-y: auto; column-count: 2; column-gap: 20px; column-rule: 1px solid #ddd; }
         .layer-info { width: 100%; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
         .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
