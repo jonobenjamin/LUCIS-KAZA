@@ -79,7 +79,7 @@
         const mapConfigs = [
             {
                 title: "KAZA Agriculture Fields & Micro Corridors",
-                subtitle: "Green agriculture fields with pre-buffered corridors in different shades of red",
+                // subtitle: "Green agriculture fields with pre-buffered corridors in different shades of red",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
                     agriculture: { show: true, file: './Data/Agri_fields_converted.geojson', style: { color: '#28a745', weight: 1, opacity: 1, fillColor: '#28a745', fillOpacity: 0.7 } },
@@ -108,7 +108,7 @@
             },
             {
                 title: "KAZA Urban Areas & Micro Corridors",
-                subtitle: "Urban areas with corridors on top, boundary outline, and urban-corridor intersects",
+                // subtitle: "Urban areas with corridors on top, boundary outline, and urban-corridor intersects",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
                     urban: { show: true, file: './Data/KAZA_urban_areas.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
@@ -138,7 +138,7 @@
             },
             {
                 title: "KAZA Suitability/Desirability & Micro Corridors",
-                subtitle: "Enhanced spectral color fading with 16-color interpolation for smooth transitions",
+                // subtitle: "Enhanced spectral color fading with 16-color interpolation for smooth transitions",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
                     corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
@@ -231,57 +231,8 @@
                 `
             },
             {
-                title: "Proximity Analysis - Urban & Agriculture",
-                subtitle: "Proximity-based suitability analysis with base layers and corridors",
-                layers: {
-                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
-                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
-                },
-                controls: `
-                    <div class="tiff-selector">
-                        <h5>Select Proximity Layer</h5>
-                        <div class="button-group">
-                            <button id="btn-urban-prox" class="active">Urban Proximity</button>
-                            <button id="btn-agri-prox">Agriculture Proximity</button>
-                        </div>
-                    </div>
-                    <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
-                    <label><input type="checkbox" id="showAgriculture"> Agriculture Fields</label>
-                    <label><input type="checkbox" id="showCorridors"> Micro Corridors</label>
-                `,
-                legend: `
-                    <h4>Proximity Scale</h4>
-                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Value 8 - Most Distant</span></div>
-                    <div style="display: flex; align-items: center; margin: 8px 0;">
-                        <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #67001f, #8a1323, #9e1626, #b2182b, #c6131a, #d7191c, #f58d4b, #fdae61, #fff3a6, #ffffbf, #c7e9ad, #abdda4, #7c5aa8, #5e4fa2, #3d7dc4, #2b83ba); border: 1px solid #ccc; margin-right: 10px;"></div>
-                        <div style="font-size: 12px; line-height: 1.2;">
-                            <div>Distant ←→ Close</div>
-                            <div>Proximity</div>
-                        </div>
-                    </div>
-                    <hr style="margin: 10px 0;">
-                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
-                `,
-                layerInfo: `
-                    <h4>Layer Information</h4>
-                    <div id="proxLayerInfo">
-                        <strong>Urban Proximity Selected</strong><br>
-                        <strong>Layers Used:</strong><br>
-                        • Urban proximity analysis<br>
-                        • Populated places data<br>
-                        • Corridors and infrastructure
-                    </div>
-                `
-            },
-            {
                 title: "LUCIS KAZA Conflict Analysis Map",
-                subtitle: "Color-coded by conflict codes from the conflict codes reference",
+                // subtitle: "Color-coded by conflict codes from the conflict codes reference",
                 layers: {
                     lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
                     corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
@@ -343,30 +294,6 @@
             'ag03': { name: 'AG03', file: './Data/AG03_polygons.geojson' },
             'ug01': { name: 'UG01', file: './Data/UG01_polygons.geojson' },
             'ug02': { name: 'UG02', file: './Data/UG02_polygons.geojson' }
-        };
-
-        // Proximity layer data (reversed scale: 8=transparent, 0=highest)
-        const proxLayers = {
-            'urban-prox': {
-                name: 'Urban Proximity',
-                file: './Data/Urban_proximity.geojson',
-                urbanLayer: './Data/KAZA_urban_areas.geojson',
-                info: `<strong>Urban Proximity Analysis</strong><br>
-                      <strong>Layers Used:</strong><br>
-                      • Populated places proximity<br>
-                      • Corridors and infrastructure<br>
-                      • Urban development patterns`
-            },
-            'agri-prox': {
-                name: 'Agriculture Proximity',
-                file: './Data/Agri_Proximity.geojson',
-                agriLayer: './Data/Agri_fields_converted.geojson',
-                info: `<strong>Agriculture Proximity Analysis</strong><br>
-                      <strong>Layers Used:</strong><br>
-                      • Agriculture proximity analysis<br>
-                      • Combined proximity factors<br>
-                      • Agricultural suitability zones`
-            }
         };
 
         // Proximity layer data (reversed scale: 8=transparent, 0=highest)
@@ -527,46 +454,6 @@
             };
         }
 
-        // Function to get style for proximity polygons (reversed scale: 8=transparent, 0=highest)
-        function getProxStyle(feature) {
-            const classValue = feature.properties.class;
-
-            // Class 8 is completely transparent (highest value = most distant)
-            if (classValue === 8) {
-                return {
-                    color: 'transparent',
-                    weight: 0.5,
-                    opacity: 0,
-                    fillColor: 'transparent',
-                    fillOpacity: 0
-                };
-            }
-
-            // Reverse the scale: higher class numbers = lower proximity = more transparent
-            // Class 7 (closest) should be most visible, Class 1 (most distant) should be least visible
-            const reverseMidpoints = {
-                1: 0.84375, // Most distant = least visible
-                2: 0.71875,
-                3: 0.59375,
-                4: 0.46875,
-                5: 0.34375,
-                6: 0.21875,
-                7: 0.09375  // Closest = most visible
-            };
-
-            const normalizedValue = reverseMidpoints[classValue] || 0.84375;
-            const fillColor = interpolateColor(normalizedValue);
-            const borderColor = darkenColor(fillColor, 0.3);
-
-            return {
-                color: borderColor,
-                weight: 0.4,
-                opacity: 0.9,
-                fillColor: fillColor,
-                fillOpacity: 0.65
-            };
-        }
-
         function getRedShadeStyle(feature, featureCounter) {
             const redShades = ['#ff0000', '#cc0000', '#aa0000', '#880000', '#660000', '#440000'];
             const shadeIndex = featureCounter % redShades.length;
@@ -592,146 +479,6 @@
                 fillColor: '#ff0000',
                 fillOpacity: fillOpacity
             };
-        }
-
-        // Proximity layer switching function
-        let currentProxLayer = null;
-        let currentUrbanLayer = null;
-        let currentAgriLayer = null;
-
-        function loadProxLayer(layerKey) {
-            const layerData = proxLayers[layerKey];
-            if (!layerData) return;
-
-            // Clear existing proximity layers
-            if (currentProxLayer && map.hasLayer(currentProxLayer)) map.removeLayer(currentProxLayer);
-            if (currentUrbanLayer && map.hasLayer(currentUrbanLayer)) map.removeLayer(currentUrbanLayer);
-            if (currentAgriLayer && map.hasLayer(currentAgriLayer)) map.removeLayer(currentAgriLayer);
-
-            currentProxLayer = null;
-            currentUrbanLayer = null;
-            currentAgriLayer = null;
-
-            document.getElementById('status').textContent = `Loading ${layerData.name}...`;
-
-            fetch(layerData.file)
-                .then(r => r.json())
-                .then(geojson => {
-                    currentProxLayer = L.geoJSON(geojson, {
-                        style: getProxStyle,
-                        onEachFeature: function(feature, layer) {
-                            const classValue = feature.properties.class;
-                            layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br>Proximity Zone`);
-                        }
-                    }).addTo(map);
-
-                    // Load overlay layers
-                    if (layerKey === 'urban-prox' && layerData.urbanLayer) {
-                        fetch(layerData.urbanLayer).then(r => r.json()).then(geojson => {
-                            currentUrbanLayer = L.geoJSON(geojson, {
-                                style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 }
-                            });
-                            if (document.getElementById('showUrban').checked) {
-                                currentUrbanLayer.addTo(map).bringToFront();
-                            }
-                        });
-                    } else if (layerKey === 'agri-prox' && layerData.agriLayer) {
-                        fetch(layerData.agriLayer).then(r => r.json()).then(geojson => {
-                            currentAgriLayer = L.geoJSON(geojson, {
-                                style: { color: '#28a745', weight: 1, opacity: 1, fillColor: '#28a745', fillOpacity: 0.7 }
-                            });
-                            if (document.getElementById('showAgriculture').checked) {
-                                currentAgriLayer.addTo(map).bringToFront();
-                            }
-                        });
-                    }
-
-                    document.getElementById('proxLayerInfo').innerHTML = layerData.info;
-                    document.getElementById('status').textContent = `Loaded ${layerData.name}`;
-                });
-        }
-
-        // Navigation
-        document.getElementById('nextMapBtn').addEventListener('click', function() {
-            currentMapIndex = (currentMapIndex + 1) % mapConfigs.length;
-            loadMapConfig(currentMapIndex);
-        });
-
-        document.getElementById('backMapBtn').addEventListener('click', function() {
-            currentMapIndex = (currentMapIndex - 1 + mapConfigs.length) % mapConfigs.length;
-            loadMapConfig(currentMapIndex);
-        });
-
-        // Layer ordering
-        map.on('layeradd', function() {
-            Object.keys(currentLayers).forEach(key => {
-                if (key.includes('Intersects') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
-                    currentLayers[key].bringToFront();
-                }
-            });
-        });
-
-        // Load map configuration
-        function loadMapConfig(configIndex) {
-            const config = mapConfigs[configIndex];
-            document.getElementById('mapTitle').textContent = config.title;
-            document.getElementById('mapSubtitle').textContent = config.subtitle || '';
-            document.getElementById('layerControls').innerHTML = config.controls;
-            document.getElementById('legend').innerHTML = config.legend;
-            document.getElementById('layerInfo').innerHTML = config.layerInfo || '';
-
-            // Clear existing layers
-            Object.values(currentLayers).forEach(layer => {
-                if (layer && map.hasLayer(layer)) map.removeLayer(layer);
-            });
-            currentLayers = {};
-
-            document.getElementById('status').textContent = `Loading ${config.title}...`;
-
-            // Load layers
-            const layerPromises = [];
-            Object.entries(config.layers).forEach(([layerKey, layerConfig]) => {
-                if (layerConfig.file === 'shp') {
-                    // Shapefile handling for LUCIS
-                    layerPromises.push(
-                        new Promise(resolve => {
-                            shp(layerConfig.url).then(geojson => {
-                                currentLayers[layerKey] = L.geoJSON(geojson, {
-                                    style: function(feature) {
-                                        const code = parseInt(feature.properties.code);
-                                        const color = conflictCodeColors[code] || '#808080';
-                                        return { color: color, weight: 1, opacity: 1, fillColor: color, fillOpacity: 0.7 };
-                                    }
-                                });
-                                if (layerConfig.show) currentLayers[layerKey].addTo(map);
-                                resolve();
-                            }).catch(() => resolve());
-                        })
-                    );
-                } else {
-                    // Regular GeoJSON
-                    layerPromises.push(
-                        fetch(layerConfig.file)
-                            .then(r => r.json())
-                            .then(geojson => {
-                                let layer;
-                                if (layerConfig.style === 'rankedCorridors') {
-                                    layer = L.geoJSON(geojson, { style: getRankedCorridorStyle });
-                                } else {
-                                    layer = L.geoJSON(geojson, { style: layerConfig.style });
-                                }
-                                currentLayers[layerKey] = layer;
-                                if (layerConfig.show) layer.addTo(map);
-                            })
-                            .catch(() => {})
-                    );
-                }
-            });
-
-            Promise.all(layerPromises).then(() => {
-                setupEventListeners(configIndex);
-                document.getElementById('status').textContent = `${config.title} loaded`;
-            });
         }
 
         // Proximity layer switching function
@@ -832,9 +579,218 @@
                 });
         }
 
-        // Setup event listeners
+        // Load a specific map configuration
+        function loadMapConfig(configIndex) {
+            const config = mapConfigs[configIndex];
+
+            // Update header
+            document.getElementById('mapTitle').textContent = config.title;
+            document.getElementById('mapSubtitle').textContent = config.subtitle;
+
+            // Update controls
+            document.getElementById('layerControls').innerHTML = config.controls;
+
+            // Update legend
+            document.getElementById('legend').innerHTML = config.legend;
+
+            // Update layer info
+            document.getElementById('layerInfo').innerHTML = config.layerInfo || '';
+
+            // Clear current layers
+            Object.values(currentLayers).forEach(layer => {
+                if (layer && map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                }
+            });
+            currentLayers = {};
+
+            // Update status
+            document.getElementById('status').textContent = `Loading ${config.title}...`;
+
+            // Load layers for this configuration
+            const layerPromises = [];
+            let featureCounter = 0;
+
+            Object.entries(config.layers).forEach(([layerKey, layerConfig]) => {
+                // Load all layers, visibility controlled by checkboxes
+
+                if (layerConfig.file === 'shp') {
+                    // Special handling for shapefile
+                    layerPromises.push(
+                        new Promise((resolve) => {
+                            shp(layerConfig.url).then(geojson => {
+                                const layer = L.geoJSON(geojson, {
+                                    style: function(feature) {
+                                        const code = parseInt(feature.properties.code);
+                                        const color = conflictCodeColors[code] || '#808080';
+                                        return {
+                                            color: color,
+                                            weight: 1,
+                                            opacity: 1,
+                                            fillColor: color,
+                                            fillOpacity: 0.7
+                                        };
+                                    },
+                                    onEachFeature: function(feature, layer) {
+                                        const code = parseInt(feature.properties.code);
+                                        const color = conflictCodeColors[code] || '#808080';
+                                        const conflictLevel = Object.keys(conflictCodeColors).find(k => conflictCodeColors[k] === color);
+                                        layer.bindPopup(`<b>Conflict Code: ${code}</b><br>Level: ${conflictLevel || 'Unknown'}`);
+                                    }
+                                });
+                                currentLayers[layerKey] = layer;
+                                if (layerConfig.show) layer.addTo(map);
+                                if ((layerKey.includes('Intersects') || layerKey.includes('intersects')) && map.hasLayer(layer)) {
+                                    layer.bringToFront();
+                                }
+                                resolve();
+                            }).catch(error => {
+                                console.error(`Error loading ${layerKey}:`, error);
+                                resolve();
+                            });
+                        })
+                    );
+                } else {
+                    // Regular GeoJSON files
+                    layerPromises.push(
+                        fetch(layerConfig.file)
+                            .then(r => r.json())
+                            .then(geojson => {
+                                let layer;
+                                let localCounter = 0;
+
+                                if (layerConfig.style === 'redShades') {
+                                    layer = L.geoJSON(geojson, {
+                                        style: function(feature) {
+                                            return getRedShadeStyle(feature, featureCounter++);
+                                        },
+                                        onEachFeature: function(feature, layer) {
+                                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                                        }
+                                    });
+                                } else if (layerConfig.style === 'rankedCorridors') {
+                                    layer = L.geoJSON(geojson, {
+                                        style: getRankedCorridorStyle,
+                                        onEachFeature: function(feature, layer) {
+                                            const rank = feature.properties.Rank || 'Unknown';
+                                            layer.bindPopup(`<b>Sensitivity Corridor</b><br><strong>Rank:</strong> ${rank}<br><strong>Priority:</strong> ${rank === 4 ? 'Highest (Main Corridor)' : rank === 3 ? 'High' : rank === 2 ? 'Medium' : 'Low (Buffer)'}`);
+                                        }
+                                    });
+                                } else {
+                                    layer = L.geoJSON(geojson, {
+                                        style: layerConfig.style,
+                                        onEachFeature: function(feature, layer) {
+                                            if (layerKey === 'agriculture') {
+                                                layer.bindPopup(`<b>Agriculture Field</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                                            } else if (layerKey === 'urban') {
+                                                layer.bindPopup(`<b>Urban Area</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                                            } else if (layerKey === 'intersects') {
+                                                layer.bindPopup(`<b>Corridor Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                                            } else if (layerKey === 'urbanIntersects') {
+                                                layer.bindPopup(`<b>Corridor-Urban Intersect</b><br><strong>ID:</strong> ${feature.properties.id || 'N/A'}`);
+                                            }
+                                        }
+                                    });
+                                }
+
+                                currentLayers[layerKey] = layer;
+                                if (layerConfig.show) layer.addTo(map);
+                                if ((layerKey.includes('Intersects') || layerKey.includes('intersects')) && map.hasLayer(layer)) {
+                                    layer.bringToFront();
+                                }
+                            })
+                            .catch(error => {
+                                console.error(`Error loading ${layerKey}:`, error);
+                            })
+                    );
+                }
+            });
+
+            // Set up event listeners for controls
+            Promise.all(layerPromises).then(() => {
+                setupEventListeners(configIndex);
+                document.getElementById('status').textContent = `${config.title} loaded successfully`;
+                console.log(`Loaded map configuration: ${config.title}`);
+            });
+        }
+
+        // Set up event listeners for current map configuration
         function setupEventListeners(configIndex) {
-            if (configIndex === 3) { // Proximity
+            const config = mapConfigs[configIndex];
+
+            // Clear existing listeners by cloning and replacing elements
+            const controlsContainer = document.getElementById('layerControls');
+            const newControls = controlsContainer.cloneNode(true);
+            controlsContainer.parentNode.replaceChild(newControls, controlsContainer);
+
+            // Re-setup event listeners
+            if (configIndex === 0) { // Agriculture
+                document.getElementById('showBoundary').addEventListener('change', function() {
+                    if (this.checked && currentLayers.boundary) map.addLayer(currentLayers.boundary);
+                    else if (currentLayers.boundary) map.removeLayer(currentLayers.boundary);
+                });
+                document.getElementById('showAgriculture').addEventListener('change', function() {
+                    if (this.checked && currentLayers.agriculture) map.addLayer(currentLayers.agriculture);
+                    else if (currentLayers.agriculture) map.removeLayer(currentLayers.agriculture);
+                });
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+                document.getElementById('showIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.intersects) {
+                        map.addLayer(currentLayers.intersects);
+                        currentLayers.intersects.bringToFront();
+                    } else if (currentLayers.intersects) {
+                        map.removeLayer(currentLayers.intersects);
+                    }
+                });
+            } else if (configIndex === 1) { // Urban
+                document.getElementById('showBoundary').addEventListener('change', function() {
+                    if (this.checked && currentLayers.boundary) map.addLayer(currentLayers.boundary);
+                    else if (currentLayers.boundary) map.removeLayer(currentLayers.boundary);
+                });
+                document.getElementById('showUrban').addEventListener('change', function() {
+                    if (this.checked && currentLayers.urban) map.addLayer(currentLayers.urban);
+                    else if (currentLayers.urban) map.removeLayer(currentLayers.urban);
+                });
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+                document.getElementById('showUrbanIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.urbanIntersects) {
+                        map.addLayer(currentLayers.urbanIntersects);
+                        currentLayers.urbanIntersects.bringToFront();
+                    } else if (currentLayers.urbanIntersects) {
+                        map.removeLayer(currentLayers.urbanIntersects);
+                    }
+                });
+            } else if (configIndex === 2) { // TIFF
+                // TIFF layer buttons
+                Object.keys(tiffLayers).forEach(key => {
+                    const button = document.getElementById(`btn-${key}`);
+                    if (button) {
+                        button.addEventListener('click', function() {
+                            loadTiffLayer(key);
+                            // Update button states
+                            Object.keys(tiffLayers).forEach(k => {
+                                const btn = document.getElementById(`btn-${k}`);
+                                if (btn) btn.classList.toggle('active', k === key);
+                            });
+                        });
+                    }
+                });
+
+                document.getElementById('showBoundary').addEventListener('change', function() {
+                    if (this.checked && currentLayers.boundary) map.addLayer(currentLayers.boundary);
+                    else if (currentLayers.boundary) map.removeLayer(currentLayers.boundary);
+                });
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+            } else if (configIndex === 3) { // Proximity
                 // Initialize with urban proximity layer
                 loadProxLayer('urban-prox');
 
@@ -875,11 +831,145 @@
                     if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
                 });
+            } else if (configIndex === 4) { // LUCIS
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
+                document.getElementById('showCorridorIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridorIntersects) {
+                        map.addLayer(currentLayers.corridorIntersects);
+                        currentLayers.corridorIntersects.bringToFront();
+                    } else if (currentLayers.corridorIntersects) {
+                        map.removeLayer(currentLayers.corridorIntersects);
+                    }
+                });
+                document.getElementById('showUrbanIntersects').addEventListener('change', function() {
+                    if (this.checked && currentLayers.urbanIntersects) {
+                        map.addLayer(currentLayers.urbanIntersects);
+                        currentLayers.urbanIntersects.bringToFront();
+                    } else if (currentLayers.urbanIntersects) {
+                        map.removeLayer(currentLayers.urbanIntersects);
+                    }
+                });
             }
         }
 
-        // Load initial map
+        // TIFF layer switching function
+        let currentTiffLayer = null;
+        function loadTiffLayer(layerKey) {
+            const layerData = tiffLayers[layerKey];
+
+            if (currentTiffLayer) {
+                if (map.hasLayer(currentTiffLayer)) map.removeLayer(currentTiffLayer);
+                currentTiffLayer = null;
+            }
+
+            document.getElementById('status').textContent = `Loading ${layerData.name}...`;
+
+            fetch(layerData.file)
+                .then(r => r.json())
+                .then(geojson => {
+                    currentTiffLayer = L.geoJSON(geojson, {
+                        style: getTiffStyle,
+                        onEachFeature: function(feature, layer) {
+                            const classValue = feature.properties.class;
+                            if (classValue === 1) {
+                                layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br><strong>Status:</strong> Transparent (Lowest sensitivity)`);
+                                return;
+                            }
+
+                            const classMidpoints = {
+                                2: 0.09375, 3: 0.21875, 4: 0.34375, 5: 0.46875,
+                                6: 0.59375, 7: 0.71875, 8: 0.84375
+                            };
+
+                            const normalizedValue = classMidpoints[classValue] || 0.84375;
+                            const color = interpolateColor(normalizedValue);
+
+                            layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br>
+                                           <strong>Interpolated Color:</strong> ${color}<br>
+                                           <strong>Normalized Range:</strong> ${((classValue - 1) * 0.125).toFixed(3)} - ${(classValue * 0.125).toFixed(3)}`);
+                        }
+                    }).addTo(map);
+
+                    // Update layer information for TIFF layers
+                    const layerInfos = {
+                        'ag01': `<strong>AG1 - Agriculture 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Agriculture Fields (Remote Sensing - WWF)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Rivers (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)`,
+                        'ag02': `<strong>AG2 - Agriculture 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Wetlands (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ag03': `<strong>AG3 - Agriculture 3</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Wetlands (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ug01': `<strong>UG1 - Urban Growth 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Airport (Africa Parks)<br>
+                                • Water (Africa Parks)<br>
+                                • Infrastructure (Africa Parks)`,
+                        'ug02': `<strong>UG2 - Urban Growth 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • [Layer information not specified]`
+                    };
+
+                    document.getElementById('tiffLayerInfo').innerHTML = layerInfos[layerKey] || `<strong>${layerData.name}</strong><br><strong>Layers Used:</strong><br>• [Layer information not available]`;
+
+                    document.getElementById('status').textContent = `Loaded ${layerData.name}: ${geojson.features.length} polygons`;
+                })
+                .catch(error => {
+                    console.error(`Error loading ${layerData.name}:`, error);
+                    document.getElementById('status').textContent = `Error loading ${layerData.name}`;
+                });
+        }
+
+        // Navigation button functionality
+        document.getElementById('nextMapBtn').addEventListener('click', function() {
+            currentMapIndex = (currentMapIndex + 1) % mapConfigs.length;
+            loadMapConfig(currentMapIndex);
+        });
+
+        document.getElementById('backMapBtn').addEventListener('click', function() {
+            currentMapIndex = (currentMapIndex - 1 + mapConfigs.length) % mapConfigs.length;
+            loadMapConfig(currentMapIndex);
+        });
+
+        // Ensure intersection layers are always on top, then corridors
+        map.on('layeradd', function() {
+            // First bring intersection layers to the very front
+            Object.keys(currentLayers).forEach(key => {
+                if ((key.includes('Intersects') || key.includes('intersects')) && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                    currentLayers[key].bringToFront();
+                }
+            });
+            // Then bring other corridor layers to front (but below intersections)
+            Object.keys(currentLayers).forEach(key => {
+                if (key.includes('corridor') && !key.includes('Intersects') && !key.includes('intersects') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                    currentLayers[key].bringToFront();
+                }
+            });
+        });
+
+        // Load initial map (Agriculture)
         loadMapConfig(0);
+
+        console.log('Unified KAZA map initialization complete');
     </script>
 </body>
 </html>
