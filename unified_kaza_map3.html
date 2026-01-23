@@ -111,9 +111,7 @@
                 // subtitle: "Urban areas with corridors on top, boundary outline, and urban-corridor intersects",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
-                    urban: { show: true, file: './Data/KAZA_urban_areas.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
-                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
-                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
+                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
                 },
                 controls: `
                     <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
@@ -300,7 +298,7 @@
         const proxLayers = {
             'urban-prox': {
                 name: 'Urban Proximity',
-                file: './Data/corridors_pop_places_proximity_reclassified_polygons.geojson',
+                file: './Data/Urban_proximity.geojson',
                 urbanLayer: './Data/KAZA_urban_areas.geojson',
                 info: `<strong>Urban Proximity Analysis</strong><br>
                       <strong>Layers Used:</strong><br>
@@ -310,7 +308,7 @@
             },
             'agri-prox': {
                 name: 'Agriculture Proximity',
-                file: './Data/combined_proximity_reclassified_polygons.geojson',
+                file: './Data/Agri_Proximity.geojson',
                 agriLayer: './Data/Agri_fields_converted.geojson',
                 info: `<strong>Agriculture Proximity Analysis</strong><br>
                       <strong>Layers Used:</strong><br>
@@ -483,6 +481,7 @@
 
         // Load a specific map configuration
         function loadMapConfig(configIndex) {
+            console.log('Loading map config:', configIndex, config.title);
             const config = mapConfigs[configIndex];
 
             // Update header
@@ -693,6 +692,7 @@
                     else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
                 });
             } else if (configIndex === 3) { // Proximity
+                console.log('Loading Proximity configuration');
                 // Initialize with urban proximity layer
                 loadProxLayer('urban-prox');
 
@@ -763,7 +763,13 @@
         let currentAgriLayer = null;
 
         function loadProxLayer(layerKey) {
+            console.log('Loading proximity layer:', layerKey);
             const layerData = proxLayers[layerKey];
+
+            if (!layerData) {
+                console.error('No layer data found for:', layerKey);
+                return;
+            }
 
             // Clear existing proximity layers
             if (currentProxLayer) {
@@ -782,9 +788,14 @@
             document.getElementById('status').textContent = `Loading ${layerData.name}...`;
 
             // Load the proximity layer
+            console.log('Fetching proximity layer from:', layerData.file);
             fetch(layerData.file)
-                .then(r => r.json())
+                .then(r => {
+                    console.log('Fetch response for', layerData.file, ':', r.status);
+                    return r.json();
+                })
                 .then(geojson => {
+                    console.log('Loaded proximity GeoJSON with', geojson.features.length, 'features');
                     currentProxLayer = L.geoJSON(geojson, {
                         style: getProxStyle,
                         onEachFeature: function(feature, layer) {
