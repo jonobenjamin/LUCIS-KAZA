@@ -231,6 +231,55 @@
                 `
             },
             {
+                title: "Proximity Analysis - Urban & Agriculture",
+                subtitle: "Proximity-based suitability analysis with base layers and corridors",
+                layers: {
+                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
+                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
+                },
+                controls: `
+                    <div class="tiff-selector">
+                        <h5>Select Proximity Layer</h5>
+                        <div class="button-group">
+                            <button id="btn-urban-prox" class="active">Urban Proximity</button>
+                            <button id="btn-agri-prox">Agriculture Proximity</button>
+                        </div>
+                    </div>
+                    <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
+                    <label><input type="checkbox" id="showAgriculture"> Agriculture Fields</label>
+                    <label><input type="checkbox" id="showCorridors"> Micro Corridors</label>
+                `,
+                legend: `
+                    <h4>Proximity Scale</h4>
+                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Value 8 - Most Distant</span></div>
+                    <div style="display: flex; align-items: center; margin: 8px 0;">
+                        <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #67001f, #8a1323, #9e1626, #b2182b, #c6131a, #d7191c, #f58d4b, #fdae61, #fff3a6, #ffffbf, #c7e9ad, #abdda4, #7c5aa8, #5e4fa2, #3d7dc4, #2b83ba); border: 1px solid #ccc; margin-right: 10px;"></div>
+                        <div style="font-size: 12px; line-height: 1.2;">
+                            <div>Distant ←→ Close</div>
+                            <div>Proximity</div>
+                        </div>
+                    </div>
+                    <hr style="margin: 10px 0;">
+                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <div id="proxLayerInfo">
+                        <strong>Urban Proximity Selected</strong><br>
+                        <strong>Layers Used:</strong><br>
+                        • Urban proximity analysis<br>
+                        • Populated places data<br>
+                        • Corridors and infrastructure
+                    </div>
+                `
+            },
+            {
                 title: "LUCIS KAZA Conflict Analysis Map",
                 subtitle: "Color-coded by conflict codes from the conflict codes reference",
                 layers: {
@@ -294,6 +343,30 @@
             'ag03': { name: 'AG03', file: './Data/AG03_polygons.geojson' },
             'ug01': { name: 'UG01', file: './Data/UG01_polygons.geojson' },
             'ug02': { name: 'UG02', file: './Data/UG02_polygons.geojson' }
+        };
+
+        // Proximity layer data (reversed scale: 8=transparent, 0=highest)
+        const proxLayers = {
+            'urban-prox': {
+                name: 'Urban Proximity',
+                file: './Data/Urban_proximity.geojson',
+                urbanLayer: './Data/KAZA_urban_areas.geojson',
+                info: `<strong>Urban Proximity Analysis</strong><br>
+                      <strong>Layers Used:</strong><br>
+                      • Populated places proximity<br>
+                      • Corridors and infrastructure<br>
+                      • Urban development patterns`
+            },
+            'agri-prox': {
+                name: 'Agriculture Proximity',
+                file: './Data/Agri_Proximity.geojson',
+                agriLayer: './Data/Agri_fields_converted.geojson',
+                info: `<strong>Agriculture Proximity Analysis</strong><br>
+                      <strong>Layers Used:</strong><br>
+                      • Agriculture proximity analysis<br>
+                      • Combined proximity factors<br>
+                      • Agricultural suitability zones`
+            }
         };
 
         // Proximity layer data (reversed scale: 8=transparent, 0=highest)
@@ -402,6 +475,46 @@
             };
 
             const normalizedValue = classMidpoints[classValue] || 0.84375;
+            const fillColor = interpolateColor(normalizedValue);
+            const borderColor = darkenColor(fillColor, 0.3);
+
+            return {
+                color: borderColor,
+                weight: 0.4,
+                opacity: 0.9,
+                fillColor: fillColor,
+                fillOpacity: 0.65
+            };
+        }
+
+        // Function to get style for proximity polygons (reversed scale: 8=transparent, 0=highest)
+        function getProxStyle(feature) {
+            const classValue = feature.properties.class;
+
+            // Class 8 is completely transparent (highest value = most distant)
+            if (classValue === 8) {
+                return {
+                    color: 'transparent',
+                    weight: 0.5,
+                    opacity: 0,
+                    fillColor: 'transparent',
+                    fillOpacity: 0
+                };
+            }
+
+            // Reverse the scale: higher class numbers = lower proximity = more transparent
+            // Class 7 (closest) should be most visible, Class 1 (most distant) should be least visible
+            const reverseMidpoints = {
+                1: 0.84375, // Most distant = least visible
+                2: 0.71875,
+                3: 0.59375,
+                4: 0.46875,
+                5: 0.34375,
+                6: 0.21875,
+                7: 0.09375  // Closest = most visible
+            };
+
+            const normalizedValue = reverseMidpoints[classValue] || 0.84375;
             const fillColor = interpolateColor(normalizedValue);
             const borderColor = darkenColor(fillColor, 0.3);
 
@@ -621,11 +734,147 @@
             });
         }
 
+        // Proximity layer switching function
+        let currentProxLayer = null;
+        let currentUrbanLayer = null;
+        let currentAgriLayer = null;
+
+        function loadProxLayer(layerKey) {
+            console.log('Loading proximity layer:', layerKey);
+            const layerData = proxLayers[layerKey];
+
+            if (!layerData) {
+                console.error('No layer data found for:', layerKey);
+                return;
+            }
+
+            // Clear existing proximity layers
+            if (currentProxLayer) {
+                if (map.hasLayer(currentProxLayer)) map.removeLayer(currentProxLayer);
+                currentProxLayer = null;
+            }
+            if (currentUrbanLayer) {
+                if (map.hasLayer(currentUrbanLayer)) map.removeLayer(currentUrbanLayer);
+                currentUrbanLayer = null;
+            }
+            if (currentAgriLayer) {
+                if (map.hasLayer(currentAgriLayer)) map.removeLayer(currentAgriLayer);
+                currentAgriLayer = null;
+            }
+
+            document.getElementById('status').textContent = `Loading ${layerData.name}...`;
+
+            // Load the proximity layer
+            console.log('Fetching proximity layer from:', layerData.file);
+            fetch(layerData.file)
+                .then(r => {
+                    console.log('Fetch response for', layerData.file, ':', r.status);
+                    return r.json();
+                })
+                .then(geojson => {
+                    console.log('Loaded proximity GeoJSON with', geojson.features.length, 'features');
+                    currentProxLayer = L.geoJSON(geojson, {
+                        style: getProxStyle,
+                        onEachFeature: function(feature, layer) {
+                            const classValue = feature.properties.class;
+                            const rangeStart = (classValue - 1) * 0.125;
+                            const rangeEnd = classValue * 0.125;
+
+                            layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br>
+                                           <strong>Proximity Range:</strong> ${rangeStart.toFixed(3)} - ${rangeEnd.toFixed(3)}<br>
+                                           ${classValue === 8 ? '<strong>Status:</strong> Most Distant (Transparent)' : '<strong>Status:</strong> Proximity Zone'}`);
+                        }
+                    }).addTo(map);
+
+                    // Load overlay layers based on selection
+                    if (layerKey === 'urban-prox') {
+                        // Load urban areas on top
+                        fetch(layerData.urbanLayer)
+                            .then(r => r.json())
+                            .then(geojson => {
+                                currentUrbanLayer = L.geoJSON(geojson, {
+                                    style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 },
+                                    onEachFeature: function(feature, layer) {
+                                        layer.bindPopup(`<b>Urban Area</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                                    }
+                                });
+                                if (document.getElementById('showUrban').checked) {
+                                    currentUrbanLayer.addTo(map);
+                                    currentUrbanLayer.bringToFront();
+                                }
+                            });
+                    } else if (layerKey === 'agri-prox') {
+                        // Load agriculture fields on top
+                        fetch(layerData.agriLayer)
+                            .then(r => r.json())
+                            .then(geojson => {
+                                currentAgriLayer = L.geoJSON(geojson, {
+                                    style: { color: '#28a745', weight: 1, opacity: 1, fillColor: '#28a745', fillOpacity: 0.7 },
+                                    onEachFeature: function(feature, layer) {
+                                        layer.bindPopup(`<b>Agriculture Field</b><br>ID: ${feature.properties.id || 'N/A'}`);
+                                    }
+                                });
+                                if (document.getElementById('showAgriculture').checked) {
+                                    currentAgriLayer.addTo(map);
+                                    currentAgriLayer.bringToFront();
+                                }
+                            });
+                    }
+
+                    // Update layer info
+                    document.getElementById('proxLayerInfo').innerHTML = layerData.info;
+
+                    document.getElementById('status').textContent = `Loaded ${layerData.name}: ${geojson.features.length} polygons`;
+                })
+                .catch(error => {
+                    console.error(`Error loading ${layerData.name}:`, error);
+                    document.getElementById('status').textContent = `Error loading ${layerData.name}`;
+                });
+        }
+
         // Setup event listeners
         function setupEventListeners(configIndex) {
             if (configIndex === 3) { // Proximity
+                // Initialize with urban proximity layer
                 loadProxLayer('urban-prox');
-                // Add proximity event listeners
+
+                // Proximity layer buttons
+                Object.keys(proxLayers).forEach(key => {
+                    const button = document.getElementById(`btn-${key}`);
+                    if (button) {
+                        button.addEventListener('click', function() {
+                            loadProxLayer(key);
+                            // Update button states
+                            Object.keys(proxLayers).forEach(k => {
+                                const btn = document.getElementById(`btn-${k}`);
+                                if (btn) btn.classList.toggle('active', k === key);
+                            });
+                        });
+                    }
+                });
+
+                document.getElementById('showUrban').addEventListener('change', function() {
+                    if (this.checked && currentUrbanLayer) {
+                        map.addLayer(currentUrbanLayer);
+                        currentUrbanLayer.bringToFront();
+                    } else if (currentUrbanLayer) {
+                        map.removeLayer(currentUrbanLayer);
+                    }
+                });
+
+                document.getElementById('showAgriculture').addEventListener('change', function() {
+                    if (this.checked && currentAgriLayer) {
+                        map.addLayer(currentAgriLayer);
+                        currentAgriLayer.bringToFront();
+                    } else if (currentAgriLayer) {
+                        map.removeLayer(currentAgriLayer);
+                    }
+                });
+
+                document.getElementById('showCorridors').addEventListener('change', function() {
+                    if (this.checked && currentLayers.corridors) map.addLayer(currentLayers.corridors);
+                    else if (currentLayers.corridors) map.removeLayer(currentLayers.corridors);
+                });
             }
         }
 
