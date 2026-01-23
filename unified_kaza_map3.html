@@ -604,6 +604,26 @@
             });
             currentLayers = {};
 
+            // Clear TIFF layers (used in TIFF configuration)
+            if (currentTiffLayer && map.hasLayer(currentTiffLayer)) {
+                map.removeLayer(currentTiffLayer);
+                currentTiffLayer = null;
+            }
+
+            // Clear proximity layers (used in Proximity configuration)
+            if (currentProxLayer && map.hasLayer(currentProxLayer)) {
+                map.removeLayer(currentProxLayer);
+                currentProxLayer = null;
+            }
+            if (currentUrbanLayer && map.hasLayer(currentUrbanLayer)) {
+                map.removeLayer(currentUrbanLayer);
+                currentUrbanLayer = null;
+            }
+            if (currentAgriLayer && map.hasLayer(currentAgriLayer)) {
+                map.removeLayer(currentAgriLayer);
+                currentAgriLayer = null;
+            }
+
             // Update status
             document.getElementById('status').textContent = `Loading ${config.title}...`;
 
