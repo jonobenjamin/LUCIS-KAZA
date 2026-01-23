@@ -79,6 +79,422 @@
         const mapConfigs = [
             {
                 title: "KAZA Agriculture Fields & Micro Corridors",
+                subtitle: "Green agriculture fields with pre-buffered corridors in different shades of red",
+                layers: {
+                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
+                    agriculture: { show: true, file: './Data/Agri_fields_converted.geojson', style: { color: '#28a745', weight: 1, opacity: 1, fillColor: '#28a745', fillOpacity: 0.7 } },
+                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
+                    intersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } }
+                },
+                controls: `
+                    <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
+                    <label><input type="checkbox" id="showAgriculture" checked> Agriculture Fields</label>
+                    <label><input type="checkbox" id="showCorridors"> Micro Corridors</label>
+                    <label><input type="checkbox" id="showIntersects"> Corridor Intersects</label>
+                `,
+                legend: `
+                    <h4>Map Legend</h4>
+                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>Agriculture Fields + Micro Corridors</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Agriculture Fields (Remote Sensing - WWF)
+                `
+            },
+            {
+                title: "KAZA Urban Areas & Micro Corridors",
+                subtitle: "Urban areas with corridors on top, boundary outline, and urban-corridor intersects",
+                layers: {
+                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
+                    urban: { show: true, file: './Data/KAZA_urban_areas.geojson', style: { color: '#6c757d', weight: 1, opacity: 1, fillColor: '#6c757d', fillOpacity: 0.7 } },
+                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
+                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
+                },
+                controls: `
+                    <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
+                    <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
+                    <label><input type="checkbox" id="showCorridors"> Micro Corridors</label>
+                    <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
+                `,
+                legend: `
+                    <h4>Map Legend</h4>
+                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>Urban + Micro Corridors</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Populated Places (Google Buildings)
+                `
+            },
+            {
+                title: "KAZA Suitability/Desirability & Micro Corridors",
+                subtitle: "Enhanced spectral color fading with 16-color interpolation for smooth transitions",
+                layers: {
+                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
+                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
+                },
+                controls: `
+                    <div class="tiff-selector">
+                        <h5>Select TIFF Layer</h5>
+                        <div class="button-group">
+                            <button id="btn-ag01" class="active">AG01</button>
+                            <button id="btn-ag02">AG02</button>
+                            <button id="btn-ag03">AG03</button>
+                            <button id="btn-ug01">UG01</button>
+                            <button id="btn-ug02">UG02</button>
+                        </div>
+                    </div>
+                    <label><input type="checkbox" id="showBoundary" checked> KAZA Boundary</label>
+                    <label><input type="checkbox" id="showCorridors" checked> Micro Corridors</label>
+                `,
+                legend: `
+                    <h4>Suitability/Desirability</h4>
+                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Lowest (Transparent)</span></div>
+                    <div style="display: flex; align-items: center; margin: 8px 0;">
+                        <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #2b83ba, #3d7dc4, #5e4fa2, #7c5aa8, #abdda4, #c7e9ad, #ffffbf, #fff3a6, #fdae61, #f58d4b, #d7191c, #c6131a, #b2182b, #9e1626, #8a1323, #67001f); border: 1px solid #ccc; margin-right: 10px;"></div>
+                        <div style="font-size: 12px; line-height: 1.2;">
+                            <div>Low ←→ High</div>
+                            <div>Suitability/Desirability</div>
+                        </div>
+                    </div>
+                    <hr style="margin: 10px 0;">
+                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <div id="tiffLayerInfo">
+                        <strong>Select a TIFF layer to see layer information</strong>
+                    </div>
+                `
+            },
+            {
+                title: "Proximity Analysis - Urban & Agriculture",
+                subtitle: "Proximity-based suitability analysis with base layers and corridors",
+                layers: {
+                    boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
+                    corridors: { show: true, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' }
+                },
+                controls: `
+                    <div class="tiff-selector">
+                        <h5>Select Proximity Layer</h5>
+                        <div class="button-group">
+                            <button id="btn-urban-prox" class="active">Urban Proximity</button>
+                            <button id="btn-agri-prox">Agriculture Proximity</button>
+                        </div>
+                    </div>
+                    <label><input type="checkbox" id="showUrban" checked> Urban Areas</label>
+                    <label><input type="checkbox" id="showAgriculture"> Agriculture Fields</label>
+                    <label><input type="checkbox" id="showCorridors"> Micro Corridors</label>
+                `,
+                legend: `
+                    <h4>Proximity Scale</h4>
+                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Value 8 - Most Distant</span></div>
+                    <div style="display: flex; align-items: center; margin: 8px 0;">
+                        <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #67001f, #8a1323, #9e1626, #b2182b, #c6131a, #d7191c, #f58d4b, #fdae61, #fff3a6, #ffffbf, #c7e9ad, #abdda4, #7c5aa8, #5e4fa2, #3d7dc4, #2b83ba); border: 1px solid #ccc; margin-right: 10px;"></div>
+                        <div style="font-size: 12px; line-height: 1.2;">
+                            <div>Distant ←→ Close</div>
+                            <div>Proximity</div>
+                        </div>
+                    </div>
+                    <hr style="margin: 10px 0;">
+                    <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <div id="proxLayerInfo">
+                        <strong>Urban Proximity Selected</strong><br>
+                        <strong>Layers Used:</strong><br>
+                        • Urban proximity analysis<br>
+                        • Populated places data<br>
+                        • Corridors and infrastructure
+                    </div>
+                `
+            },
+            {
+                title: "LUCIS KAZA Conflict Analysis Map",
+                subtitle: "Color-coded by conflict codes from the conflict codes reference",
+                layers: {
+                    lucis: { show: true, file: 'shp', url: 'https://jonobenjamin.github.io/LUCIS-KAZA/Data/LUCIS_KAZA', style: 'conflictCodes' },
+                    corridors: { show: false, file: './Data/KAZA_corridors_sensitivity_wgs84.geojson', style: 'rankedCorridors' },
+                    corridorIntersects: { show: false, file: './Data/KAZA_corridors_intersect_wgs84.geojson', style: { color: '#000000', weight: 4, opacity: 1, fillColor: '#000000', fillOpacity: 0.3 } },
+                    urbanIntersects: { show: false, file: './Data/corridor_urban_intersect.geojson', style: { color: '#000000', weight: 5, opacity: 1, fillColor: '#000000', fillOpacity: 0.4 } }
+                },
+                controls: `
+                    <label><input type="checkbox" id="showCorridors" checked> Micro Corridors</label>
+                    <label><input type="checkbox" id="showCorridorIntersects"> Corridor Intersects</label>
+                    <label><input type="checkbox" id="showUrbanIntersects"> Corridor-Urban Intersects</label>
+                `,
+                    legend: `
+                    <h4>Conflict Levels</h4>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff2317"></div><span>High Conflict</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #A7C635"></div><span>Potential Conflict</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
+                    <hr style="margin: 10px 0;">
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
+                `,
+                layerInfo: `
+                    <h4>Layer Information</h4>
+                    <strong>LUCIS KAZA</strong><br>
+                    <strong>Layers Used:</strong><br>
+                    • Conflict evaluation matrix (Conflict 4)
+                `
+            }
+        ];
+
+        // Spectral color ramp for smooth interpolation (Matplotlib spectral colors)
+        const spectralColors = [
+            { value: 0.000, color: '#2b83ba' },     // Blue
+            { value: 0.0625, color: '#3d7dc4' },    // Blue transition
+            { value: 0.125, color: '#5e4fa2' },     // Blue-purple
+            { value: 0.1875, color: '#7c5aa8' },    // Purple transition
+            { value: 0.250, color: '#abdda4' },     // Light green
+            { value: 0.3125, color: '#c7e9ad' },    // Green transition
+            { value: 0.375, color: '#ffffbf' },     // Yellow
+            { value: 0.4375, color: '#fff3a6' },    // Yellow transition
+            { value: 0.500, color: '#fdae61' },     // Orange
+            { value: 0.5625, color: '#f58d4b' },    // Orange transition
+            { value: 0.625, color: '#d7191c' },     // Red
+            { value: 0.6875, color: '#c6131a' },    // Red transition
+            { value: 0.750, color: '#b2182b' },     // Dark red
+            { value: 0.8125, color: '#9e1626' },    // Dark red transition
+            { value: 0.875, color: '#8a1323' },     // Very dark red
+            { value: 1.000, color: '#67001f' }      // Deep red
+        ];
+
+        // TIFF layer data
+        const tiffLayers = {
+            'ag01': { name: 'AG01', file: './Data/AG01_polygons.geojson' },
+            'ag02': { name: 'AG02', file: './Data/AG02_polygons.geojson' },
+            'ag03': { name: 'AG03', file: './Data/AG03_polygons.geojson' },
+            'ug01': { name: 'UG01', file: './Data/UG01_polygons.geojson' },
+            'ug02': { name: 'UG02', file: './Data/UG02_polygons.geojson' }
+        };
+
+        // Proximity layer data (reversed scale: 8=transparent, 0=highest)
+        const proxLayers = {
+            'urban-prox': {
+                name: 'Urban Proximity',
+                file: './Data/Urban_proximity.geojson',
+                urbanLayer: './Data/KAZA_urban_areas.geojson',
+                info: `<strong>Urban Proximity Analysis</strong><br>
+                      <strong>Layers Used:</strong><br>
+                      • Populated places proximity<br>
+                      • Corridors and infrastructure<br>
+                      • Urban development patterns`
+            },
+            'agri-prox': {
+                name: 'Agriculture Proximity',
+                file: './Data/Agri_Proximity.geojson',
+                agriLayer: './Data/Agri_fields_converted.geojson',
+                info: `<strong>Agriculture Proximity Analysis</strong><br>
+                      <strong>Layers Used:</strong><br>
+                      • Agriculture proximity analysis<br>
+                      • Combined proximity factors<br>
+                      • Agricultural suitability zones`
+            }
+        };
+
+        // Conflict code to color mapping
+        const conflictCodeColors = {
+            111: '#7BBB3F',    // Low Conflict
+            112: '#C5D79B',    // No Conflict
+            113: '#C5D79B',    // No Conflict
+            121: '#C5D79B',    // No Conflict
+            122: '#A7C635',    // Potential Conflict
+            123: '#C5D79B',    // No Conflict
+            131: '#C5D79B',    // No Conflict
+            132: '#C5D79B',    // No Conflict
+            133: '#C5D79B',    // No Conflict
+            211: '#C5D79B',    // No Conflict
+            212: '#A7C635',    // Potential Conflict
+            213: '#C5D79B',    // No Conflict
+            221: '#A7C635',    // Potential Conflict
+            222: '#A7C635',    // Potential Conflict
+            223: '#C5D79B',    // No Conflict
+            231: '#C5D79B',    // No Conflict
+            232: '#C5D79B',    // No Conflict
+            233: '#A7C635',    // Potential Conflict
+            311: '#C5D79B',    // No Conflict
+            312: '#A7C635',    // Potential Conflict
+            313: '#A7C635',    // Potential Conflict
+            321: '#C5D79B',    // No Conflict
+            322: '#C5D79B',    // No Conflict
+            323: '#A7C635',    // Potential Conflict
+            331: '#C5D79B',    // No Conflict
+            332: '#A7C635',    // Potential Conflict
+            333: '#ff2317'     // High Conflict
+        };
+
+        // Utility functions
+        function interpolateColor(value) {
+            if (value <= 0) return spectralColors[0].color;
+            if (value >= 1) return spectralColors[spectralColors.length - 1].color;
+
+            for (let i = 0; i < spectralColors.length - 1; i++) {
+                if (value >= spectralColors[i].value && value <= spectralColors[i + 1].value) {
+                    const ratio = (value - spectralColors[i].value) / (spectralColors[i + 1].value - spectralColors[i + 1].value - spectralColors[i].value);
+                    return blendColors(spectralColors[i].color, spectralColors[i + 1].color, ratio);
+                }
+            }
+            return spectralColors[spectralColors.length - 1].color;
+        }
+
+        function blendColors(color1, color2, ratio) {
+            const r1 = parseInt(color1.slice(1, 3), 16);
+            const g1 = parseInt(color1.slice(3, 5), 16);
+            const b1 = parseInt(color1.slice(5, 7), 16);
+
+            const r2 = parseInt(color2.slice(1, 3), 16);
+            const g2 = parseInt(color2.slice(3, 5), 16);
+            const b2 = parseInt(color2.slice(5, 7), 16);
+
+            const r = Math.round(r1 + (r2 - r1) * ratio);
+            const g = Math.round(g1 + (g2 - g1) * ratio);
+            const b = Math.round(b1 + (b2 - b1) * ratio);
+
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        function darkenColor(color, factor) {
+            const r = Math.max(0, Math.floor(parseInt(color.slice(1, 3), 16) * (1 - factor)));
+            const g = Math.max(0, Math.floor(parseInt(color.slice(3, 5), 16) * (1 - factor)));
+            const b = Math.max(0, Math.floor(parseInt(color.slice(5, 7), 16) * (1 - factor)));
+
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        // Style functions
+        function getTiffStyle(feature) {
+            const classValue = feature.properties.class;
+            if (classValue === 1) {
+                return { color: 'transparent', weight: 0.5, opacity: 0, fillColor: 'transparent', fillOpacity: 0 };
+            }
+
+            const classMidpoints = {
+                2: 0.09375, 3: 0.21875, 4: 0.34375, 5: 0.46875,
+                6: 0.59375, 7: 0.71875, 8: 0.84375
+            };
+
+            const normalizedValue = classMidpoints[classValue] || 0.84375;
+            const fillColor = interpolateColor(normalizedValue);
+            const borderColor = darkenColor(fillColor, 0.3);
+
+            return {
+                color: borderColor,
+                weight: 0.4,
+                opacity: 0.9,
+                fillColor: fillColor,
+                fillOpacity: 0.65
+            };
+        }
+
+        // Function to get style for proximity polygons (reversed scale: 8=transparent, 0=highest)
+        function getProxStyle(feature) {
+            const classValue = feature.properties.class;
+
+            // Class 8 is completely transparent (highest value = most distant)
+            if (classValue === 8) {
+                return {
+                    color: 'transparent',
+                    weight: 0.5,
+                    opacity: 0,
+                    fillColor: 'transparent',
+                    fillOpacity: 0
+                };
+            }
+
+            // Reverse the scale: higher class numbers = lower proximity = more transparent
+            // Class 7 (closest) should be most visible, Class 1 (most distant) should be least visible
+            const reverseMidpoints = {
+                1: 0.84375, // Most distant = least visible
+                2: 0.71875,
+                3: 0.59375,
+                4: 0.46875,
+                5: 0.34375,
+                6: 0.21875,
+                7: 0.09375  // Closest = most visible
+            };
+
+            const normalizedValue = reverseMidpoints[classValue] || 0.84375;
+            const fillColor = interpolateColor(normalizedValue);
+            const borderColor = darkenColor(fillColor, 0.3);
+
+            return {
+                color: borderColor,
+                weight: 0.4,
+                opacity: 0.9,
+                fillColor: fillColor,
+                fillOpacity: 0.65
+            };
+        }
+
+        function getRedShadeStyle(feature, featureCounter) {
+            const redShades = ['#ff0000', '#cc0000', '#aa0000', '#880000', '#660000', '#440000'];
+            const shadeIndex = featureCounter % redShades.length;
+            return {
+                color: redShades[shadeIndex],
+                weight: 2,
+                opacity: 1,
+                fillColor: redShades[shadeIndex],
+                fillOpacity: 0.8
+            };
+        }
+
+        function getRankedCorridorStyle(feature) {
+            const rank = feature.properties.Rank || 1;
+            const opacity = rank === 4 ? 1.0 : rank === 3 ? 0.7 : rank === 2 ? 0.4 : 0.2;
+            const fillOpacity = rank === 4 ? 0.8 : rank === 3 ? 0.5 : rank === 2 ? 0.3 : 0.1;
+            const weight = rank === 4 ? 3 : rank === 3 ? 2 : rank === 2 ? 1 : 0.5;
+
+            return {
+                color: '#ff0000',
+                weight: weight,
+                opacity: opacity,
+                fillColor: '#ff0000',
+                fillOpacity: fillOpacity
+            };
+        }
+    <script>
+        // Initialize map - will maintain zoom/position across layer switches
+        const map = L.map('map').setView([-18.5, 23.5], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Global layer storage
+        let currentLayers = {};
+        let currentMapIndex = 0;
+
+        // Map configurations
+        const mapConfigs = [
+            {
+                title: "KAZA Agriculture Fields & Micro Corridors",
                 // subtitle: "Green agriculture fields with pre-buffered corridors in different shades of red",
                 layers: {
                     boundary: { show: true, file: './Data/KAZA_Boundary.geojson', style: { color: '#000000', weight: 3, opacity: 1, fillColor: 'transparent', fillOpacity: 0 } },
@@ -757,6 +1173,129 @@
             }
         }
 
+        // Proximity layer variables
+        let currentProxLayer = null;
+        let currentUrbanLayer = null;
+        let currentAgriLayer = null;
+
+        // TIFF layer switching function
+        let currentTiffLayer = null;
+        function loadTiffLayer(layerKey) {
+            const layerData = tiffLayers[layerKey];
+
+            if (currentTiffLayer) {
+                if (map.hasLayer(currentTiffLayer)) map.removeLayer(currentTiffLayer);
+                currentTiffLayer = null;
+            }
+
+            document.getElementById('status').textContent = `Loading ${layerData.name}...`;
+
+            fetch(layerData.file)
+                .then(r => r.json())
+                .then(geojson => {
+                    currentTiffLayer = L.geoJSON(geojson, {
+                        style: getTiffStyle,
+                        onEachFeature: function(feature, layer) {
+                            const classValue = feature.properties.class;
+                            if (classValue === 1) {
+                                layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br><strong>Status:</strong> Transparent (Lowest sensitivity)`);
+                                return;
+                            }
+
+                            const classMidpoints = {
+                                2: 0.09375, 3: 0.21875, 4: 0.34375, 5: 0.46875,
+                                6: 0.59375, 7: 0.71875, 8: 0.84375
+                            };
+
+                            const normalizedValue = classMidpoints[classValue] || 0.84375;
+                            const color = interpolateColor(normalizedValue);
+
+                            layer.bindPopup(`<b>${layerData.name} - Class ${classValue}</b><br>
+                                           <strong>Interpolated Color:</strong> ${color}<br>
+                                           <strong>Normalized Range:</strong> ${((classValue - 1) * 0.125).toFixed(3)} - ${(classValue * 0.125).toFixed(3)}`);
+                        }
+                    }).addTo(map);
+
+                    // Update layer information for TIFF layers
+                    const layerInfos = {
+                        'ag01': `<strong>AG1 - Agriculture 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Agriculture Fields (Remote Sensing - WWF)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Rivers (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)`,
+                        'ag02': `<strong>AG2 - Agriculture 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Wetlands (Africa Parks)<br>
+                                • Pans and Water Bodies (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ag03': `<strong>AG3 - Agriculture 3</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Wetlands (Africa Parks)<br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)`,
+                        'ug01': `<strong>UG1 - Urban Growth 1</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • Soils (Africa Parks)<br>
+                                • Populated Places (Google Buildings)<br>
+                                • Roads (Tracks 4 Africa)<br>
+                                • Airport (Africa Parks)<br>
+                                • Water (Africa Parks)<br>
+                                • Infrastructure (Africa Parks)`,
+                        'ug02': `<strong>UG2 - Urban Growth 2</strong><br>
+                                <strong>Layers Used:</strong><br>
+                                • [Layer information not specified]`
+                    };
+
+                    document.getElementById('tiffLayerInfo').innerHTML = layerInfos[layerKey] || `<strong>${layerData.name}</strong><br><strong>Layers Used:</strong><br>• [Layer information not available]`;
+
+                    document.getElementById('status').textContent = `Loaded ${layerData.name}: ${geojson.features.length} polygons`;
+                })
+                .catch(error => {
+                    console.error(`Error loading ${layerData.name}:`, error);
+                    document.getElementById('status').textContent = `Error loading ${layerData.name}`;
+                });
+        }
+
+        // Navigation button functionality
+        document.getElementById('nextMapBtn').addEventListener('click', function() {
+            currentMapIndex = (currentMapIndex + 1) % mapConfigs.length;
+            loadMapConfig(currentMapIndex);
+        });
+
+        document.getElementById('backMapBtn').addEventListener('click', function() {
+            currentMapIndex = (currentMapIndex - 1 + mapConfigs.length) % mapConfigs.length;
+            loadMapConfig(currentMapIndex);
+        });
+
+        // Ensure proper layer ordering: intersections > corridors > overlays > proximity base
+        map.on('layeradd', function() {
+            // First bring intersection layers to the very front
+            Object.keys(currentLayers).forEach(key => {
+                if ((key.includes('Intersects') || key.includes('intersects')) && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                    currentLayers[key].bringToFront();
+                }
+            });
+            // Then bring corridor layers
+            Object.keys(currentLayers).forEach(key => {
+                if (key.includes('corridor') && !key.includes('Intersects') && !key.includes('intersects') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
+                    currentLayers[key].bringToFront();
+                }
+            });
+            // Then bring overlay layers (urban/agri on proximity maps)
+            if (currentUrbanLayer && map.hasLayer(currentUrbanLayer)) {
+                currentUrbanLayer.bringToFront();
+            }
+            if (currentAgriLayer && map.hasLayer(currentAgriLayer)) {
+                currentAgriLayer.bringToFront();
+            }
+        });
+
         // Proximity layer switching function
         let currentProxLayer = null;
         let currentUrbanLayer = null;
@@ -938,40 +1477,6 @@
                     document.getElementById('status').textContent = `Error loading ${layerData.name}`;
                 });
         }
-
-        // Navigation button functionality
-        document.getElementById('nextMapBtn').addEventListener('click', function() {
-            currentMapIndex = (currentMapIndex + 1) % mapConfigs.length;
-            loadMapConfig(currentMapIndex);
-        });
-
-        document.getElementById('backMapBtn').addEventListener('click', function() {
-            currentMapIndex = (currentMapIndex - 1 + mapConfigs.length) % mapConfigs.length;
-            loadMapConfig(currentMapIndex);
-        });
-
-        // Ensure proper layer ordering: intersections > corridors > overlays > proximity base
-        map.on('layeradd', function() {
-            // First bring intersection layers to the very front
-            Object.keys(currentLayers).forEach(key => {
-                if ((key.includes('Intersects') || key.includes('intersects')) && currentLayers[key] && map.hasLayer(currentLayers[key])) {
-                    currentLayers[key].bringToFront();
-                }
-            });
-            // Then bring corridor layers
-            Object.keys(currentLayers).forEach(key => {
-                if (key.includes('corridor') && !key.includes('Intersects') && !key.includes('intersects') && currentLayers[key] && map.hasLayer(currentLayers[key])) {
-                    currentLayers[key].bringToFront();
-                }
-            });
-            // Then bring overlay layers (urban/agri on proximity maps)
-            if (currentUrbanLayer && map.hasLayer(currentUrbanLayer)) {
-                currentUrbanLayer.bringToFront();
-            }
-            if (currentAgriLayer && map.hasLayer(currentAgriLayer)) {
-                currentAgriLayer.bringToFront();
-            }
-        });
 
         // Load initial map (Agriculture)
         loadMapConfig(0);
