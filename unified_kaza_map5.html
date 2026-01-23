@@ -8,13 +8,13 @@
     <style>
         body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; display: flex; flex-direction: column; height: 100vh; }
         .header { background-color: #2c3e50; color: white; padding: 15px 20px; text-align: center; flex-shrink: 0; }
-        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .left-sidebar { width: 320px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100%; position: relative; }
+        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; padding-bottom: 200px; }
+        .left-sidebar { width: 280px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100%; position: relative; }
         .controls { flex: 0 0 auto; padding: 15px; border-bottom: 1px solid #eee; max-height: 40vh; overflow-y: auto; }
         .legend { flex: 1; padding: 15px; overflow-y: auto; }
         .map-area { flex: 1; position: relative; background: #f8f9fa; height: 100%; }
         #map { height: 100%; width: 100%; }
-        .bottom-ribbon { position: absolute; bottom: 0; left: 320px; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; max-height: 200px; overflow-y: auto; }
+        .bottom-ribbon { position: absolute; bottom: 0; left: 280px; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; max-height: 200px; overflow-y: auto; }
         .layer-info { width: 100%; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
         .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
@@ -23,7 +23,7 @@
         .layer-controls input[type="checkbox"] { margin-right: 8px; }
         .tiff-selector { margin-bottom: 20px; }
         .tiff-selector h5 { margin-bottom: 8px; font-size: 14px; }
-        .tiff-selector .button-group { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tiff-selector .button-group { display: flex; flex-direction: column; gap: 4px; }
         .tiff-selector button { flex: 1; min-width: 80px; padding: 6px 8px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px; font-size: 12px; }
         .tiff-selector button.active { background: #007bff; color: white; border-color: #007bff; }
         .tiff-selector button:hover { background: #e9ecef; }
