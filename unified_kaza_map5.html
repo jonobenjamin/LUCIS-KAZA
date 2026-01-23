@@ -116,12 +116,9 @@
                 layerInfo: `
                     <h4>Layer Information</h4>
                     <ul>
-                        <li>Agriculture Fields</li>
-                        <li>Remote Sensing</li>
-                        <li>WWF Data</li>
+                        <li>Agriculture Fields (Remote Sensing-WWF Data)</li>
                         <li>Micro Corridors</li>
-                        <li>Sensitivity Analysis</li>
-                        <li>Buffer Zones</li>
+                        <li>Corridor-Agriculture Intersects</li>
                     </ul>
                 `
             },
@@ -151,12 +148,9 @@
                 layerInfo: `
                     <h4>Layer Information</h4>
                     <ul>
-                        <li>Urban Areas</li>
-                        <li>Populated Places</li>
-                        <li>Google Buildings</li>
+                        <li>Urban Areas (Google Buildings)</li>
                         <li>Micro Corridors</li>
-                        <li>Sensitivity Analysis</li>
-                        <li>Intersection Zones</li>
+                        <li>Corridor-Urban Intersects</li>
                     </ul>
                 `
             },
@@ -237,12 +231,8 @@
                     <h4>Layer Information</h4>
                     <div id="proxLayerInfo">
                         <ul>
-                            <li>Urban Proximity</li>
-                            <li>Populated Places</li>
-                            <li>Proximity Analysis</li>
+                            <li>Populated Places (Google Buildings)</li>
                             <li>Corridors</li>
-                            <li>Infrastructure</li>
-                            <li>Development Patterns</li>
                         </ul>
                     </div>
                 `
@@ -275,12 +265,8 @@
                 layerInfo: `
                     <h4>Layer Information</h4>
                     <ul>
-                        <li>LUCIS KAZA</li>
-                        <li>Conflict Analysis</li>
-                        <li>Evaluation Matrix</li>
+                        <li>Conflict Evaluation Matrix (CEM)</li>
                         <li>Conflict Level 4</li>
-                        <li>Human-Wildlife</li>
-                        <li>Conflict Zones</li>
                     </ul>
                 `
             }
@@ -335,12 +321,8 @@
                 file: './Data/Agri_Proximity.geojson',
                 agriLayer: './Data/Agri_fields_converted.geojson',
                 info: `<ul>
-                          <li>Agriculture Proximity</li>
-                          <li>Proximity Analysis</li>
-                          <li>Combined Factors</li>
-                          <li>Suitability Zones</li>
-                          <li>Crop Areas</li>
-                          <li>Land Use</li>
+                          <li>Agriculture Fields (Remote Sensing-WWF Data)</li>
+                          <li>Corridors</li>
                       </ul>`
             }
         };
@@ -940,57 +922,39 @@
                     // Update layer information for TIFF layers
                     const layerInfos = {
                         'ag01': `<ul>
-                                    <li>Agriculture Fields</li>
-                                    <li>Remote Sensing</li>
-                                    <li>WWF Data</li>
-                                    <li>Soils</li>
-                                    <li>Africa Parks</li>
-                                    <li>Populated Places</li>
-                                    <li>Google Buildings</li>
-                                    <li>Roads</li>
-                                    <li>Tracks 4 Africa</li>
-                                    <li>Rivers</li>
-                                    <li>Pans</li>
-                                    <li>Water Bodies</li>
+                                    <li>Agriculture Fields (Remote Sensing-WWF Data)</li>
+                                    <li>Soils (Africa Parks)</li>
+                                    <li>Populated Places (Google Buildings)</li>
+                                    <li>Roads (Tracks 4 Africa)</li>
+                                    <li>Rivers (Africa Parks)</li>
+                                    <li>Pans (Africa Parks)</li>
+                                    <li>Water Bodies (Africa Parks)</li>
                                 </ul>`,
                         'ag02': `<ul>
-                                    <li>Populated Places</li>
-                                    <li>Google Buildings</li>
-                                    <li>Roads</li>
-                                    <li>Tracks 4 Africa</li>
-                                    <li>Wetlands</li>
-                                    <li>Africa Parks</li>
-                                    <li>Pans</li>
-                                    <li>Water Bodies</li>
-                                    <li>Soils</li>
-                                    <li>Population Data</li>
+                                    <li>PPopulated Places (Google Buildings</li>
+                                    li>Roads (Tracks 4 Africa)</li>
+                                    <li>Wetlands (Africa Parks)</li>
+                                    <li>Pans (Africa Parks)</li>
+                                    <li>Water Bodies (Africa Parks)</li>
+                                    <li>Soils (Africa Parks)</li>
+                                    <li>Population Data (Africa Parks)</li>
                                 </ul>`,
                         'ag03': `<ul>
-                                    <li>Wetlands</li>
-                                    <li>Africa Parks</li>
-                                    <li>Soils</li>
-                                    <li>Populated Places</li>
-                                    <li>Google Buildings</li>
-                                    <li>Agricultural Zones</li>
+                                    <li>Wetlands (Africa Parks)</li>
+                                    <li>Soils (Africa Parks)</li>
+                                    <li>Populated Places (Google Buildings)</li>
                                 </ul>`,
                         'ug01': `<ul>
-                                    <li>Soils</li>
-                                    <li>Africa Parks</li>
-                                    <li>Populated Places</li>
-                                    <li>Google Buildings</li>
+                                    <li>Soils (Africa Parks)</li>
+                                    <li>Populated Places (Google Buildings)</li>
                                     <li>Roads</li>
-                                    <li>Tracks 4 Africa</li>
-                                    <li>Airport</li>
-                                    <li>Water</li>
-                                    <li>Infrastructure</li>
+                                    <li>Roads (Tracks 4 Africa)</li>
+                                    <li>Airport (Africa Parks)</li>
+                                    <li>Water (Africa Parks)</li>
+                                    <li>Infrastructure (Africa Parks)</li>
                                 </ul>`,
                         'ug02': `<ul>
-                                    <li>Urban Growth</li>
-                                    <li>Development Patterns</li>
-                                    <li>Population Density</li>
-                                    <li>Infrastructure</li>
-                                    <li>Land Use</li>
-                                    <li>Growth Analysis</li>
+                                    <li>***</li>
                                 </ul>`
                     };
 
