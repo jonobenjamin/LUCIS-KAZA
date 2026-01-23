@@ -8,18 +8,18 @@
     <style>
         body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; display: flex; flex-direction: column; height: 100vh; }
         .header { background-color: #2c3e50; color: white; padding: 15px 20px; text-align: center; flex-shrink: 0; }
-        .main-content { display: flex; flex: 1; overflow: hidden; }
-        .left-sidebar { width: 320px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; flex-shrink: 0; }
+        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
+        .left-sidebar { width: 320px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100%; position: relative; }
         .controls { flex: 0 0 auto; padding: 15px; border-bottom: 1px solid #eee; max-height: 40vh; overflow-y: auto; }
         .legend { flex: 1; padding: 15px; overflow-y: auto; }
-        .map-area { flex: 1; position: relative; background: #f8f9fa; }
+        .map-area { flex: 1; position: relative; background: #f8f9fa; height: 100%; }
         #map { height: 100%; width: 100%; }
-        .bottom-ribbon { background: white; padding: 15px; border-top: 1px solid #ddd; flex-shrink: 0; max-height: 200px; overflow-y: auto; }
+        .bottom-ribbon { position: absolute; bottom: 0; left: 320px; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; max-height: 200px; overflow-y: auto; }
         .layer-info { width: 100%; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
         .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
         .status { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; font-size: 12px; }
-        .layer-controls label { display: block; margin: 5px 0; font-size: 14px; }
+        .layer-controls label { display: block; margin: 8px 0; font-size: 14px; }
         .layer-controls input[type="checkbox"] { margin-right: 8px; }
         .tiff-selector { margin-bottom: 20px; }
         .tiff-selector h5 { margin-bottom: 8px; font-size: 14px; }
@@ -103,7 +103,7 @@
                     <h4>Map Legend</h4>
                     <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                 `,
                 layerInfo: `
@@ -132,7 +132,7 @@
                     <h4>Map Legend</h4>
                     <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Micro Corridors</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000"></div><span>Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `,
@@ -166,7 +166,6 @@
                 `,
                 legend: `
                     <h4>Suitability/Desirability</h4>
-                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Lowest (Transparent)</span></div>
                     <div style="display: flex; align-items: center; margin: 8px 0;">
                         <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #2b83ba, #3d7dc4, #5e4fa2, #7c5aa8, #abdda4, #c7e9ad, #ffffbf, #fff3a6, #fdae61, #f58d4b, #d7191c, #c6131a, #b2182b, #9e1626, #8a1323, #67001f); border: 1px solid #ccc; margin-right: 10px;"></div>
                         <div style="font-size: 12px; line-height: 1.2;">
@@ -176,10 +175,7 @@
                     </div>
                     <hr style="margin: 10px 0;">
                     <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000;"></div><span>Corridors</span></div>
                 `,
                 layerInfo: `
                     <h4>Layer Information</h4>
@@ -209,7 +205,6 @@
                 `,
                 legend: `
                     <h4>Proximity Scale</h4>
-                    <div class="legend-item"><div class="legend-color" style="background-color: transparent; border: 2px solid #666;"></div><span>Value 8 - Most Distant</span></div>
                     <div style="display: flex; align-items: center; margin: 8px 0;">
                         <div style="width: 20px; height: 120px; background: linear-gradient(to bottom, #67001f, #8a1323, #9e1626, #b2182b, #c6131a, #d7191c, #f58d4b, #fdae61, #fff3a6, #ffffbf, #c7e9ad, #abdda4, #7c5aa8, #5e4fa2, #3d7dc4, #2b83ba); border: 1px solid #ccc; margin-right: 10px;"></div>
                         <div style="font-size: 12px; line-height: 1.2;">
@@ -221,10 +216,7 @@
                     <div class="legend-item"><div class="legend-color" style="border: 2px solid #000000; background-color: transparent"></div><span>KAZA Boundary</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #28a745"></div><span>Agriculture Fields</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #6c757d"></div><span>Urban Areas</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000;"></div><span>Corridors</span></div>
                 `,
                 layerInfo: `
                     <h4>Layer Information</h4>
@@ -258,10 +250,7 @@
                     <div class="legend-item"><div class="legend-color" style="background-color: #7BBB3F"></div><span>Low Conflict</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #C5D79B"></div><span>No Conflict</span></div>
                     <hr style="margin: 10px 0;">
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 1.0;"></div><span>Corridors - Rank 4 (Main Corridor)</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.7;"></div><span>Corridors - Rank 3</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.4;"></div><span>Corridors - Rank 2</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000; opacity: 0.2;"></div><span>Corridors - Rank 1 (Buffers)</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ff0000;"></div><span>Corridors</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor Intersects</span></div>
                     <div class="legend-item"><div class="legend-color" style="background-color: #000000; border: 2px solid #000000"></div><span>Corridor-Urban Intersects</span></div>
                 `,
