@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'unified_kaza_map.html'
+      - 'landuse_conflict.html'
       - 'Data/**'
   schedule:
     # Run daily at 7 AM UTC
@@ -49,7 +49,7 @@ jobs:
             mkdir -p "$repo_path/kaza"
             
             # Copy unified KAZA map HTML file
-            cp unified_kaza_map.html "$repo_path/kaza/"
+            cp landuse_conflict.html "$repo_path/kaza/"
             
             # Copy the Data folder with all GeoJSON files
             echo "  📂 Copying Data folder..."
@@ -80,7 +80,7 @@ jobs:
 
           ## 🚀 View the Map
 
-          Open `unified_kaza_map.html` in a web browser or view it via GitHub Pages.
+          Open `landuse_conflict.html` in a web browser or view it via GitHub Pages.
 
           ## 📊 Map Sections
 
@@ -145,8 +145,8 @@ jobs:
 
           ## 🚀 View the Map
 
-          Open `unified_kaza_map.html` in a web browser or access via GitHub Pages:
-          `https://ecoexist.github.io/Elephant-Tracking/kaza/unified_kaza_map.html`
+          Open `landuse_conflict.html` in a web browser or access via GitHub Pages:
+          `https://ecoexist.github.io/Elephant-Tracking/kaza/landuse_conflict.html`
 
           ## 📊 Map Sections
 
