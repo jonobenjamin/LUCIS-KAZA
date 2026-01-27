@@ -269,23 +269,6 @@
                         <li>Conflict Level 4</li>
                     </ul>
                 `
-            },
-            {
-                title: "ArcGIS Online Dashboard",
-                type: "iframe",
-                iframeUrl: "https://ecoexist.maps.arcgis.com/apps/dashboards/ac4895422fb14fea9aef73f381aa6197",
-                layers: {},
-                controls: `
-                    <p style="font-size: 12px; color: #666;">Hosted ArcGIS Online dashboard</p>
-                `,
-                legend: `
-                    <h4>Dashboard View</h4>
-                    <p style="font-size: 12px; color: #666;">Interactive ArcGIS dashboard displaying KAZA data and analytics.</p>
-                `,
-                layerInfo: `
-                    <h4>Layer Information</h4>
-                    <p style="font-size: 12px;">Hosted ArcGIS Online dashboard</p>
-                `
             }
         ];
 
@@ -643,25 +626,6 @@
                 currentAgriLayer = null;
             }
 
-            // Special handling for iframe type
-            if (config.type === "iframe") {
-                const mapDiv = document.getElementById('map');
-                mapDiv.innerHTML = `<iframe src="${config.iframeUrl}" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>`;
-                document.getElementById('status').style.display = 'none';
-                return;
-            } else {
-                // Restore map if coming from iframe view
-                const mapDiv = document.getElementById('map');
-                if (!mapDiv.querySelector('.leaflet-container')) {
-                    mapDiv.innerHTML = '';
-                    map = L.map('map').setView([-17.8, 23.5], 7);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(map);
-                }
-                document.getElementById('status').style.display = 'block';
-            }
-
             // Update status
             document.getElementById('status').textContent = `Loading ${config.title}...`;
 
@@ -910,8 +874,6 @@
                         map.removeLayer(currentLayers.urbanIntersects);
                     }
                 });
-            } else if (configIndex === 5) { // ArcGIS Dashboard
-                // No interactive controls needed for iframe
             }
         }
 
